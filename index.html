@@ -2173,6 +2173,15 @@
                 
                 tabContents.forEach(content => content.classList.remove('active'));
                 document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+                
+                // Load problems based on the selected tab
+                if (tab.getAttribute('data-tab') === 'pending-problems') {
+                    loadProblems('pending');
+                } else if (tab.getAttribute('data-tab') === 'solved-problems') {
+                    loadProblems('solved');
+                } else {
+                    loadProblems('all');
+                }
             });
         });
 
@@ -2234,7 +2243,21 @@
 
         // Refresh problems
         if (refreshProblemsBtn) {
-            refreshProblemsBtn.addEventListener('click', loadProblems);
+            refreshProblemsBtn.addEventListener('click', () => {
+                // Load problems based on current active tab
+                const activeTab = document.querySelector('.nav-tab.active');
+                if (activeTab) {
+                    if (activeTab.getAttribute('data-tab') === 'pending-problems') {
+                        loadProblems('pending');
+                    } else if (activeTab.getAttribute('data-tab') === 'solved-problems') {
+                        loadProblems('solved');
+                    } else {
+                        loadProblems('all');
+                    }
+                } else {
+                    loadProblems('all');
+                }
+            });
         }
 
         // Profile form
@@ -2702,9 +2725,16 @@
         });
     }
 
-    function loadProblems() {
+    function loadProblems(filter = 'all') {
         showLoading();
         let query = db.collection('problems').orderBy('createdAt', 'desc');
+        
+        // Apply filter based on status
+        if (filter === 'pending') {
+            query = query.where('status', '==', 'pending');
+        } else if (filter === 'solved') {
+            query = query.where('status', '==', 'solved');
+        }
         
         // Modified this part to show all problems to technicians in dashboard view
         // Only filter by assigned problems when in the "problems" view
