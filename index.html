@@ -1693,15 +1693,15 @@
 <script>
     // Firebase Configuration
     const firebaseConfig = {
-        apiKey: "AIzaSyDFYvXGMhRrb1bFpiZT491QDbdUdxtiiR0",
-        authDomain: "dbnb01-552cc.firebaseapp.com",
-        databaseURL: "https://dbnb01-552cc-default-rtdb.firebaseio.com",
-        projectId: "dbnb01-552cc",
-        storageBucket: "dbnb01-552cc.appspot.com",
-        messagingSenderId: "461946586806",
-        appId: "1:461946586806:web:6fcd2144282501cf4d4817",
-        measurementId: "G-MSP00JT8MG"
-    };
+       apiKey: "AIzaSyDFYvXGMhRrb1bFpiZT491QDbdUdxtiiR0",
+  authDomain: "dbnb01-552cc.firebaseapp.com",
+  databaseURL: "https://dbnb01-552cc-default-rtdb.firebaseio.com",
+  projectId: "dbnb01-552cc",
+  storageBucket: "dbnb01-552cc.firebasestorage.app",
+  messagingSenderId: "461946586806",
+  appId: "1:461946586806:web:6fcd2144282501cf4d4817",
+  measurementId: "G-MSP00JT8MG"
+};
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
@@ -3684,7 +3684,7 @@
     }
 
     function initFirebaseMessaging() {
-        messaging.getToken({ vapidKey: 'BHFdDaCbaH4QxQVTvbVduTjSC5AQv7ZFJdR6xgAlZH8t-6g9FDwTtXFIn9oV_8KwaaT-KSCptuCJ4uRX1OV0MX0' }).then((currentToken) => {
+        messaging.getToken({ vapidKey: 'BOVegNHVIRp69hxsN8tNanb87hXFAApJWu76t2EOIW4CW7gmLI6bh5MXKxq7qevGDdx0PizjrA8xYsZBIG5roJQ' }).then((currentToken) => {
             if (currentToken) {
                 // Send the token to your server and update the UI if necessary
                 console.log('FCM token:', currentToken);
