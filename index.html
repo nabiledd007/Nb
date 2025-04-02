@@ -1209,7 +1209,7 @@
         <div class="auth-card animate__animated animate__fadeIn">
             <div class="auth-header">
                 <div class="auth-logo">
-                    <i class="fa-brands fa-sketch fa-fade"></i>
+                    <i class="fa-brands fa-sketch"></i>
                     <span>NB CODE</span>
                 </div>
                 <div class="auth-title" data-i18n="welcome">Welcome Back</div>
@@ -1264,7 +1264,7 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <i class="fa-brands fa-sketch fa-fade"></i>
+                    <i class="fa-brands fa-sketch"></i>
                     <span>NB CODE</span>
                 </div>
             </div>
@@ -1690,7 +1690,7 @@
     <script src="https://cdn.jsdelivr.net/npm/i18next@21.6.10/i18next.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@1.3.2/i18nextHttpBackend.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
- <script>
+<script>
     // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyDFYvXGMhRrb1bFpiZT491QDbdUdxtiiR0",
@@ -1719,6 +1719,7 @@
     let currentLanguage = 'en';
     let currentTheme = 'light';
     let technicians = []; // Store technicians list
+    let currentProblemFilter = 'all'; // 'all', 'pending', or 'solved'
 
     // DOM Elements
     const authContainer = document.getElementById('auth-container');
@@ -1767,6 +1768,9 @@
     const mobileNotificationBadge = document.getElementById('mobile-notification-badge');
     const technicianAssignmentContainer = document.getElementById('technician-assignment-container');
     const assignTechnicianSelect = document.getElementById('assign-technician');
+    const filterAllBtn = document.getElementById('filter-all');
+    const filterPendingBtn = document.getElementById('filter-pending');
+    const filterSolvedBtn = document.getElementById('filter-solved');
 
     // Language configuration
     const languageMap = {
@@ -2173,15 +2177,6 @@
                 
                 tabContents.forEach(content => content.classList.remove('active'));
                 document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
-                
-                // Load problems based on the selected tab
-                if (tab.getAttribute('data-tab') === 'pending-problems') {
-                    loadProblems('pending');
-                } else if (tab.getAttribute('data-tab') === 'solved-problems') {
-                    loadProblems('solved');
-                } else {
-                    loadProblems('all');
-                }
             });
         });
 
@@ -2243,21 +2238,7 @@
 
         // Refresh problems
         if (refreshProblemsBtn) {
-            refreshProblemsBtn.addEventListener('click', () => {
-                // Load problems based on current active tab
-                const activeTab = document.querySelector('.nav-tab.active');
-                if (activeTab) {
-                    if (activeTab.getAttribute('data-tab') === 'pending-problems') {
-                        loadProblems('pending');
-                    } else if (activeTab.getAttribute('data-tab') === 'solved-problems') {
-                        loadProblems('solved');
-                    } else {
-                        loadProblems('all');
-                    }
-                } else {
-                    loadProblems('all');
-                }
-            });
+            refreshProblemsBtn.addEventListener('click', loadProblems);
         }
 
         // Profile form
@@ -2268,6 +2249,25 @@
         // New user button
         if (newUserBtn) {
             newUserBtn.addEventListener('click', showNewUserForm);
+        }
+
+        // Problem filter buttons
+        if (filterAllBtn) {
+            filterAllBtn.addEventListener('click', () => {
+                setProblemFilter('all');
+            });
+        }
+
+        if (filterPendingBtn) {
+            filterPendingBtn.addEventListener('click', () => {
+                setProblemFilter('pending');
+            });
+        }
+
+        if (filterSolvedBtn) {
+            filterSolvedBtn.addEventListener('click', () => {
+                setProblemFilter('solved');
+            });
         }
 
         // Check for saved theme preference
@@ -2725,16 +2725,58 @@
         });
     }
 
-    function loadProblems(filter = 'all') {
+    function setProblemFilter(filter) {
+        currentProblemFilter = filter;
+        
+        // Update active state of filter buttons
+        document.querySelectorAll('.problem-filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        if (filter === 'all') {
+            filterAllBtn.classList.add('active');
+        } else if (filter === 'pending') {
+            filterPendingBtn.classList.add('active');
+        } else if (filter === 'solved') {
+            filterSolvedBtn.classList.add('active');
+        }
+        
+        // Update the problems list
+        updateProblemsList();
+    }
+
+    function updateProblemsList() {
+        problemsList.innerHTML = '';
+        
+        let filteredProblems = problems;
+        
+        if (currentProblemFilter === 'pending') {
+            filteredProblems = problems.filter(p => p.status === 'pending');
+        } else if (currentProblemFilter === 'solved') {
+            filteredProblems = problems.filter(p => p.status === 'solved');
+        }
+        
+        if (filteredProblems.length === 0) {
+            const emptyState = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 class="empty-state-title" data-i18n="no_problems">No Problems Found</h3>
+                    <p class="empty-state-text" data-i18n="no_problems_text">There are currently no problems to display.</p>
+                </div>
+            `;
+            problemsList.innerHTML = emptyState;
+        } else {
+            filteredProblems.forEach(problem => {
+                renderProblemCard(problem, problemsList);
+            });
+        }
+    }
+
+    function loadProblems() {
         showLoading();
         let query = db.collection('problems').orderBy('createdAt', 'desc');
-        
-        // Apply filter based on status
-        if (filter === 'pending') {
-            query = query.where('status', '==', 'pending');
-        } else if (filter === 'solved') {
-            query = query.where('status', '==', 'solved');
-        }
         
         // Modified this part to show all problems to technicians in dashboard view
         // Only filter by assigned problems when in the "problems" view
@@ -2804,6 +2846,9 @@
                     pendingProblemsList.innerHTML = emptyState;
                     solvedProblemsList.innerHTML = emptyState;
                 }
+                
+                // Update the filtered view
+                updateProblemsList();
             })
             .catch(error => {
                 console.error('Error loading problems:', error);
