@@ -1693,15 +1693,15 @@
 <script>
     // Firebase Configuration
     const firebaseConfig = {
-       apiKey: "AIzaSyDFYvXGMhRrb1bFpiZT491QDbdUdxtiiR0",
-  authDomain: "dbnb01-552cc.firebaseapp.com",
-  databaseURL: "https://dbnb01-552cc-default-rtdb.firebaseio.com",
-  projectId: "dbnb01-552cc",
-  storageBucket: "dbnb01-552cc.firebasestorage.app",
-  messagingSenderId: "461946586806",
-  appId: "1:461946586806:web:6fcd2144282501cf4d4817",
-  measurementId: "G-MSP00JT8MG"
-};
+        apiKey: "AIzaSyDFYvXGMhRrb1bFpiZT491QDbdUdxtiiR0",
+        authDomain: "dbnb01-552cc.firebaseapp.com",
+        databaseURL: "https://dbnb01-552cc-default-rtdb.firebaseio.com",
+        projectId: "dbnb01-552cc",
+        storageBucket: "dbnb01-552cc.appspot.com",
+        messagingSenderId: "461946586806",
+        appId: "1:461946586806:web:6fcd2144282501cf4d4817",
+        measurementId: "G-MSP00JT8MG"
+    };
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
@@ -1890,7 +1890,9 @@
                 "assigned_problem_notification": "Problem Assigned to You",
                 "problem_solved_notification": "Problem Solved",
                 "info_request_title": "Information Request",
-                "assign_technician": "Assign Technician"
+                "assign_technician": "Assign Technician",
+                "admin_password_required": "Administrator password is required",
+                "contact_nabil": "Contact Mr. Nabil Eddghoughi"
             }
         },
         fr: {
@@ -2001,7 +2003,9 @@
                 "assigned_problem_notification": "Problème assigné à vous",
                 "problem_solved_notification": "Problème résolu",
                 "info_request_title": "Demande d'informations",
-                "assign_technician": "Assigner un technicien"
+                "assign_technician": "Assigner un technicien",
+                "admin_password_required": "Mot de passe administrateur requis",
+                "contact_nabil": "Contacter M. Nabil Eddghoughi"
             }
         },
         ar: {
@@ -2112,7 +2116,9 @@
                 "assigned_problem_notification": "تم تعيين مشكلة لك",
                 "problem_solved_notification": "تم حل المشكلة",
                 "info_request_title": "طلب معلومات",
-                "assign_technician": "تعيين فني"
+                "assign_technician": "تعيين فني",
+                "admin_password_required": "كلمة مرور المسؤول مطلوبة",
+                "contact_nabil": "اتصل بالسيد نبيل الدغوغي"
             }
         }
     };
@@ -2518,6 +2524,15 @@
         if (!name || !email || !password) {
             showToast(i18next.t('fill_all_fields'), 'error');
             return;
+        }
+        
+        // Check if role is Administrator and verify password
+        if (role === 'admin') {
+            const adminPassword = prompt(i18next.t('admin_password_required'));
+            if (adminPassword !== 'NBEDD@1993') {
+                showToast(i18next.t('contact_nabil'), 'error');
+                return;
+            }
         }
         
         showLoading();
@@ -3754,7 +3769,7 @@
         }
     }
 
-
+    // Start the app
     initializeApp();
 </script>
 </body>
