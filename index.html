@@ -1810,36 +1810,36 @@
     <!-- Toast Notifications -->
     <div id="toast-container" class="toast-container"></div>
 
-   <!-- QR Code Modal -->
+<!-- QR Code Modal -->
 <div class="qr-modal" id="qr-modal">
     <div class="qr-modal-content">
-      <h4>Share This App</h4>
+      <h4 data-i18n="share_app">Share This App</h4>
       
       <div class="qr-tabs">
-        <button class="qr-tab active" data-tab="web" data-i18n="Web_Version">Web Version</button>
-        <button class="qr-tab" data-tab="android">Android App</button>
+        <button class="qr-tab active" data-tab="web" data-i18n="web_version">Web Version</button>
+        <button class="qr-tab" data-tab="android" data-i18n="android_app">Android App</button>
       </div>
       
       <div class="qr-code-container">
         <div id="web-qr" class="qr-code active fade-in">
-          <h5 class="qr-title">Web Version</h5>
+          <h5 class="qr-title" data-i18n="web_version">Web Version</h5>
           <canvas id="web-qr-code"></canvas>
-            <!-- class="qr-url">https://nabiledd007.github.io/Nb/</p-->
+        
         </div>
         
         <div id="android-qr" class="qr-code">
-          <h5 class="qr-title">Android App</h5>
+          <h5 class="qr-title" data-i18n="android_app">Android App</h5>
           <canvas id="android-qr-code"></canvas>
-          <!-- p class="qr-url">https://drive.google.com/.../1sfjFWmGdU7mIo8iZvKQSSbTg3KF3IenR</p -->
+          
         </div>
       </div>
       
       <div class="qr-buttons">
-        <button class="btn btn-outline" id="qr-modal-close">Close</button>
-        <button class="btn btn-primary" id="download-qr">Download QR</button>
+        <button class="btn btn-outline" id="qr-modal-close" data-i18n="close">Close</button>
+        <button class="btn btn-primary" id="download-qr" data-i18n="download_qr">Download QR</button>
       </div>
     </div>
-  </div>
+</div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
@@ -2059,7 +2059,7 @@
 "android_app": "Android App",
 "scan_web_qr": "Scan this QR code to open the web version on your mobile device",
 "scan_android_qr": "Scan this QR code to download the Android app from the Play Store",
-                "contact_nabil": "Contact Mr. Nabil Eddghoughi"
+                "contact_nabil": "Contact Mr. Nabil Eddghoughi", "download_qr": "Download QR"
               
             }
         },
@@ -2177,7 +2177,7 @@
 "android_app": "Application Android",
 "scan_web_qr": "Scannez ce code QR pour ouvrir la version web sur votre appareil mobile",
 "scan_android_qr": "Scannez ce code QR pour télécharger l'application Android depuis le Play Store",
-                "contact_nabil": "Contacter M. Nabil Eddghoughi"
+                "contact_nabil": "Contacter M. Nabil Eddghoughi","download_qr": "Télécharger QR"
             }
         },
         es: {
@@ -2294,7 +2294,7 @@
 "android_app": "Aplicación Android",
 "scan_web_qr": "Escanee este código QR para abrir la versión web en su dispositivo móvil",
 "scan_android_qr": "Escanee este código QR para descargar la aplicación Android desde Play Store",
-            "contact_nabil": "Contactar al Sr. Nabil Eddghoughi"
+            "contact_nabil": "Contactar al Sr. Nabil Eddghoughi","download_qr": "Descargar QR"
         }
     },
         ar: {
@@ -2411,7 +2411,7 @@
 "android_app": "تطبيق أندرويد",
 "scan_web_qr": "امسح رمز الاستجابة السريعة هذا لفتح النسخة الويب على جهازك المحمول",
 "scan_android_qr": "امسح رمز الاستجابة السريعة هذا لتنزيل تطبيق أندرويد من متجر Play",
-                "contact_nabil": "اتصل بالسيد نبيل الدغوغي"
+                "contact_nabil": "اتصل بالسيد نبيل الدغوغي","download_qr": "تحميل رمز الاستجابة"
             }
         }
     };
