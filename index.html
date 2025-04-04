@@ -57,7 +57,141 @@
             
             --transition: all 0.3s ease;
         }
+        .qr-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
 
+    .qr-modal.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .qr-modal-content {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+      gap: 0.5rem;
+    }
+
+    .qr-tab {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      background: none;
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+
+    .qr-tab.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .qr-code-container {
+      position: relative;
+      margin: 1rem 0;
+      min-height: 256px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .qr-code {
+      transition: var(--transition);
+      position: absolute;
+      opacity: 0;
+      transform: scale(0.9);
+    }
+
+    .qr-code.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .qr-title {
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+
+    .qr-url {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+      word-break: break-all;
+      padding: 0 1rem;
+    }
+
+    .qr-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--primary-light);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
         /* Dark Mode Variables */
         .dark-mode {
             --primary-color: #4895ef;
@@ -1410,44 +1544,45 @@
                     </div>
                 </div>
 
-                <!-- Problems View -->
-                <div id="problems-view" class="view" style="display: none;">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title" data-i18n="all_problems">All Problems</h2>
-                            <div class="header-actions">
-                                <button class="btn btn-sm btn-primary" id="new-problem-btn">
-                                    <i class="fas fa-plus"></i>
-                                    <span data-i18n="new_problem">New Problem</button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="nav-tabs">
-                                <div class="nav-tab active" data-tab="all-problems" data-i18n="all">All</div>
-                                <div class="nav-tab" data-tab="pending-problems" data-i18n="pending">Pending</div>
-                                <div class="nav-tab" data-tab="solved-problems" data-i18n="solved">Solved</div>
-                            </div>
-                            
-                            <div id="all-problems" class="tab-content active">
-                                <div id="all-problems-list" class="problems-list">
-                                    <!-- All problems will be loaded here -->
-                                </div>
-                            </div>
-                            
-                            <div id="pending-problems" class="tab-content">
-                                <div id="pending-problems-list" class="problems-list">
-                                    <!-- Pending problems will be loaded here -->
-                                </div>
-                            </div>
-                            
-                            <div id="solved-problems" class="tab-content">
-                                <div id="solved-problems-list" class="problems-list">
-                                    <!-- Solved problems will be loaded here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+              <!-- Problems View -->
+<div id="problems-view" class="view" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title" data-i18n="all_problems">All Problems</h2>
+            <div class="header-actions">
+                <button class="btn btn-sm btn-primary" id="new-problem-btn">
+                    <i class="fas fa-plus"></i>
+                    <span data-i18n="new_problem">New Problem</span>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="all-problems" data-i18n="all">All</div>
+                <div class="nav-tab" data-tab="pending-problems" data-i18n="pending">Pending</div>
+                <div class="nav-tab" data-tab="solved-problems" data-i18n="solved">Solved</div>
+            </div>
+            
+            <div id="all-problems" class="tab-content active">
+                <div id="all-problems-list" class="problems-list">
+                    <!-- All problems will be loaded here -->
                 </div>
+            </div>
+            
+            <div id="pending-problems" class="tab-content">
+                <div id="pending-problems-list" class="problems-list">
+                    <!-- Pending problems will be loaded here -->
+                </div>
+            </div>
+            
+            <div id="solved-problems" class="tab-content">
+                <div id="solved-problems-list" class="problems-list">
+                    <!-- Solved problems will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Notifications View -->
                 <div id="notifications-view" class="view" style="display: none;">
@@ -1675,16 +1810,39 @@
     <!-- Toast Notifications -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- QR Code Modal -->
-    <div class="qr-modal" id="qr-modal">
-        <div class="qr-modal-content">
-            <h4 data-i18n="share_app">Share this App</h4>
-            <div class="qr-code-container" id="qr-code"></div>
-            <button class="btn btn-primary mt-2" id="qr-modal-close" data-i18n="close">Close</button>
+   <!-- QR Code Modal -->
+<div class="qr-modal" id="qr-modal">
+    <div class="qr-modal-content">
+      <h4>Share This App</h4>
+      
+      <div class="qr-tabs">
+        <button class="qr-tab active" data-tab="web">Web Version</button>
+        <button class="qr-tab" data-tab="android">Android App</button>
+      </div>
+      
+      <div class="qr-code-container">
+        <div id="web-qr" class="qr-code active fade-in">
+          <h5 class="qr-title">Web Version</h5>
+          <canvas id="web-qr-code"></canvas>
+            <!-- class="qr-url">https://nabiledd007.github.io/Nb/</p-->
         </div>
+        
+        <div id="android-qr" class="qr-code">
+          <h5 class="qr-title">Android App</h5>
+          <canvas id="android-qr-code"></canvas>
+          <!-- p class="qr-url">https://drive.google.com/.../1sfjFWmGdU7mIo8iZvKQSSbTg3KF3IenR</p -->
+        </div>
+      </div>
+      
+      <div class="qr-buttons">
+        <button class="btn btn-outline" id="qr-modal-close">Close</button>
+        <button class="btn btn-primary" id="download-qr">Download QR</button>
+      </div>
     </div>
+  </div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/i18next@21.6.10/i18next.min.js"></script>
@@ -1772,7 +1930,12 @@
     const filterPendingBtn = document.getElementById('filter-pending');
     const filterSolvedBtn = document.getElementById('filter-solved');
 
-    // Language configuration
+  const downloadQrBtn = document.getElementById('download-qr');
+  const qrTabs = document.querySelectorAll('.qr-tab');
+  const qrCodes = document.querySelectorAll('.qr-code');
+   // QR Code URLs
+   const webUrl = 'https://nabiledd007.github.io/Nb/';
+  const androidUrl = 'https://drive.google.com/drive/folders/1sfjFWmGdU7mIo8iZvKQSSbTg3KF3IenR?usp=sharing';    // Language configuration
     const languageMap = {
         en: { flag: 'gb', name: 'English' },
         fr: { flag: 'fr', name: 'Français' },
@@ -2008,6 +2171,119 @@
                 "contact_nabil": "Contacter M. Nabil Eddghoughi"
             }
         },
+        es: {
+        translation: {
+            "welcome": "Bienvenido de nuevo",
+            "email": "Correo electrónico",
+            "password": "Contraseña",
+            "login": "Iniciar sesión",
+            "signup": "Crear cuenta",
+            "name": "Nombre",
+            "role": "Rol",
+            "technician": "Técnico",
+            "teamleader": "Líder de equipo",
+            "admin": "Administrador",
+            "complete_signup": "Crear cuenta",
+            "back_to_login": "Volver al inicio de sesión",
+            "copyright": "© 2025 NB CODE. Todos los derechos reservados.",
+            "dashboard": "Panel de control",
+            "problems": "Problemas",
+            "notifications": "Notificaciones",
+            "profile": "Perfil",
+            "users": "Usuarios",
+            "reports": "Informes",
+            "total_problems": "Problemas totales",
+            "pending": "Pendientes",
+            "solved": "Resueltos",
+            "response_time": "Tiempo de respuesta promedio",
+            "recent_problems": "Problemas recientes",
+            "refresh": "Actualizar",
+            "all_problems": "Todos los problemas",
+            "new_problem": "Nuevo problema",
+            "all": "Todos",
+            "mark_all_read": "Marcar todo como leído",
+            "coming_soon": "Próximamente",
+            "reports_coming_soon": "Informes detallados y análisis estarán disponibles en una futura actualización.",
+            "notify_me": "Notificarme",
+            "users_management": "Gestión de usuarios",
+            "new_user": "Nuevo usuario",
+            "status": "Estado",
+            "actions": "Acciones",
+            "title": "Título",
+            "description": "Descripción",
+            "severity_level": "Nivel de gravedad",
+            "low": "Bajo",
+            "medium": "Medio",
+            "high": "Alto",
+            "critical": "Crítico",
+            "cancel": "Cancelar",
+            "submit": "Enviar",
+            "problem_details": "Detalles del problema",
+            "assigned_to": "Asignado a",
+            "solution": "Solución",
+            "solved_at": "Resuelto el",
+            "reported_by": "Reportado por",
+            "reported_at": "Reportado el",
+            "your_response": "Tu respuesta",
+            "mark_as_solved": "Marcar como resuelto",
+            "need_more_info": "Necesito más información",
+            "close": "Cerrar",
+            "share_app": "Compartir esta aplicación",
+            "save_changes": "Guardar cambios",
+            "theme": "Tema",
+            "light": "Claro",
+            "dark": "Oscuro",
+            "system": "Predeterminado del sistema",
+            "fill_all_fields": "Por favor complete todos los campos",
+            "login_success": "Inicio de sesión exitoso",
+            "signup_success": "Cuenta creada exitosamente",
+            "logout_success": "Cierre de sesión exitoso",
+            "logout_error": "Error al cerrar sesión",
+            "problem_submitted": "Problema enviado exitosamente",
+            "submission_error": "Error al enviar el problema",
+            "load_problems_error": "Error al cargar los problemas",
+            "no_problems": "No se encontraron problemas",
+            "no_problems_text": "Actualmente no hay problemas para mostrar.",
+            "problem_solved": "Problema marcado como resuelto",
+            "update_error": "Error al actualizar el problema",
+            "enter_solution": "Por favor ingrese una solución",
+            "request_sent": "Solicitud enviada exitosamente",
+            "request_error": "Error al enviar la solicitud",
+            "confirm_delete": "¿Está seguro de que desea eliminar este problema?",
+            "problem_deleted": "Problema eliminado exitosamente",
+            "delete_error": "Error al eliminar el problema",
+            "assign_to_technician": "Asignar a técnico",
+            "select_technician": "Seleccionar técnico",
+            "no_technicians": "No se encontraron técnicos",
+            "problem_assigned": "Problema asignado exitosamente",
+            "assign_error": "Error al asignar el problema",
+            "no_notifications": "No hay notificaciones",
+            "no_notifications_text": "No tienes ninguna notificación todavía.",
+            "notifications_marked_read": "Todas las notificaciones marcadas como leídas",
+            "name_required": "El nombre es requerido",
+            "profile_updated": "Perfil actualizado exitosamente",
+            "profile_update_error": "Error al actualizar el perfil",
+            "confirm_delete_user": "¿Está seguro de que desea eliminar este usuario?",
+            "user_deleted": "Usuario eliminado exitosamente",
+            "delete_user_error": "Error al eliminar el usuario",
+            "edit_user": "Editar usuario",
+            "user_updated": "Usuario actualizado exitosamente",
+            "update_user_error": "Error al actualizar el usuario",
+            "create_user": "Crear usuario",
+            "user_created": "Usuario creado exitosamente",
+            "create_user_error": "Error al crear el usuario",
+            "unknown": "Desconocido",
+            "unknown_technician": "Técnico desconocido",
+            "need_more_info_default": "Necesito más información para resolver este problema",
+            "new_problem_notification": "Nuevo problema asignado",
+            "assigned_problem_notification": "Problema asignado a usted",
+            "problem_solved_notification": "Problema resuelto",
+            "info_request_title": "Solicitud de información",
+            "assign_technician": "Asignar técnico",
+            "admin_password_required": "Se requiere contraseña de administrador",
+            "contact_nabil": "Contactar al Sr. Nabil Eddghoughi"
+        }
+    },
         ar: {
             translation: {
                 "welcome": "مرحبًا بعودتك",
@@ -2206,7 +2482,92 @@
                 languageDropdown.classList.remove('show');
             }
         });
+        let activeQr = 'web';
+  let currentCanvas = null;
 
+  // Initialize QR codes
+  function initQRCodes() {
+    // Web QR Code
+    QRCode.toCanvas(document.getElementById('web-qr-code'), webUrl, {
+      width: 200,
+      margin: 1,
+      color: {
+        dark: '#2b2d42',
+        light: '#ffffff'
+      }
+    }, (err, canvas) => {
+      if (err) console.error('Web QR error:', err);
+    });
+    
+    // Android QR Code
+    QRCode.toCanvas(document.getElementById('android-qr-code'), androidUrl, {
+      width: 200,
+      margin: 1,
+      color: {
+        dark: '#2b2d42',
+        light: '#ffffff'
+      }
+    }, (err, canvas) => {
+      if (err) console.error('Android QR error:', err);
+    });
+  }
+
+  // Switch between QR codes
+  function switchQrTab(tab) {
+    activeQr = tab;
+    
+    // Update active tab
+    qrTabs.forEach(t => t.classList.remove('active'));
+    document.querySelector(`.qr-tab[data-tab="${tab}"]`).classList.add('active');
+    
+    // Update active QR code with animation
+    qrCodes.forEach(code => {
+      code.classList.remove('active', 'fade-in');
+      if (code.id === `${tab}-qr`) {
+        setTimeout(() => {
+          code.classList.add('active', 'fade-in');
+          currentCanvas = code.querySelector('canvas');
+        }, 10);
+      }
+    });
+  }
+
+  // Download QR code
+  function downloadQR() {
+    if (!currentCanvas) return;
+    
+    const link = document.createElement('a');
+    link.download = `${activeQr}-app-qr.png`;
+    link.href = currentCanvas.toDataURL('image/png');
+    link.click();
+  }
+
+  // Event Listeners
+  qrBtn.addEventListener('click', () => {
+    qrModal.classList.add('show');
+    initQRCodes();
+  });
+
+  qrModalClose.addEventListener('click', () => {
+    qrModal.classList.remove('show');
+  });
+
+  qrModal.addEventListener('click', (e) => {
+    if (e.target === qrModal) {
+      qrModal.classList.remove('show');
+    }
+  });
+
+  qrTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      switchQrTab(tab.getAttribute('data-tab'));
+    });
+  });
+
+  downloadQrBtn.addEventListener('click', downloadQR);
+
+  // Initialize with web QR active
+  currentCanvas = document.getElementById('web-qr-code');
         // QR Code Button
         qrBtn.addEventListener('click', showQRCodeModal);
         qrModalClose.addEventListener('click', () => {
@@ -2594,7 +2955,12 @@
                     const initials = userData.name.split(' ').map(n => n[0]).join('').toUpperCase();
                     document.getElementById('user-avatar').textContent = initials;
                     document.getElementById('profile-picture').textContent = initials;
-                    
+                    const newProblemBtn = document.getElementById('new-problem-btn');
+                if (userRole === 'technician') {
+                    newProblemBtn.style.display = 'none'; // Hide for technicians
+                } else {
+                    newProblemBtn.style.display = 'block'; // Show for others
+                }
                     // Set language preference
                     if (userData.language) {
                         currentLanguage = userData.language;
@@ -2767,7 +3133,7 @@
         
         if (currentProblemFilter === 'pending') {
             filteredProblems = problems.filter(p => p.status === 'pending');
-        } else if (currentProblemFilter === 'solved') {
+        } else if (currentProblemFilter === 'solved') { 
             filteredProblems = problems.filter(p => p.status === 'solved');
         }
         
@@ -3749,7 +4115,14 @@
             console.error('Error saving token:', error);
         });
     }
-
+    function updateUIForRole(role) {
+    // Handle new problem button
+    const newProblemBtn = document.getElementById('new-problem-btn');
+    const allowedRoles = newProblemBtn.getAttribute('data-allowed-roles').split(',');
+    newProblemBtn.style.display = allowedRoles.includes(role) ? 'block' : 'none';
+    
+    // You can add other role-based UI changes here
+}
     // Initialize the app
     function initializeApp() {
         // Check for saved language preference
