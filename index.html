@@ -3068,99 +3068,60 @@
     }
 
     // Problem Management
- function submitProblem() {
-    const title = document.getElementById('problem-title').value;
-    const description = document.getElementById('problem-description').value;
-    const level = document.getElementById('problem-level').value;
-    const assignedTechnicianId = assignTechnicianSelect.value;
-    
-    if (!title || !description) {
-        showToast(i18next.t('fill_all_fields'), 'error');
-        return;
-    }
-    
-    showLoading();
-    
-    // Prepare problem data
-    const problemData = {
-        title: title,
-        description: description,
-        level: level,
-        status: 'pending',
-        createdBy: currentUser.uid,
-        createdByName: document.getElementById('user-name').textContent,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        solution: null,
-        solvedAt: null
-    };
-    
-    // Add assigned technician if selected (only for team leaders and admins)
-    if ((userRole === 'teamleader' || userRole === 'admin') && assignedTechnicianId) {
-        const selectedTechnician = technicians.find(t => t.id === assignedTechnicianId);
-        if (selectedTechnician) {
-            problemData.assignedTo = selectedTechnician.id;
-            problemData.assignedToName = selectedTechnician.name;
-            
-            // Notify the technician
-            notifyTechnician(selectedTechnician.id, problemData.title, problemData.description);
-            
-            // Send push notification to technician
-            sendPushNotification(
-                selectedTechnician.id,
-                i18next.t('new_problem_notification'),
-                `${title}: ${description.substring(0, 100)}...`
-            );
+    function submitProblem() {
+        const title = document.getElementById('problem-title').value;
+        const description = document.getElementById('problem-description').value;
+        const level = document.getElementById('problem-level').value;
+        const assignedTechnicianId = assignTechnicianSelect.value;
+        
+        if (!title || !description) {
+            showToast(i18next.t('fill_all_fields'), 'error');
+            return;
         }
-    }
-    
-    // Save problem to Firestore
-    db.collection('problems').add(problemData)
-    .then((docRef) => {
-        showToast(i18next.t('problem_submitted'), 'success');
-        document.getElementById('problem-form').reset();
-        newProblemModal.hide();
-        loadProblems();
-    })
-    .catch(error => {
-        console.error('Error submitting problem:', error);
-        showToast(i18next.t('submission_error'), 'error');
-    })
-    .finally(() => {
-        hideLoading();
-    });
-}
-  
-
-// Add this new function to send push notifications
-function sendPushNotification(userId, title, body) {
-    // Get the user's FCM token from Firestore
-    db.collection('users').doc(userId).get()
-        .then(doc => {
-            if (doc.exists) {
-                const userData = doc.data();
-                const fcmToken = userData.fcmToken;
+        
+        showLoading();
+        
+        // Prepare problem data
+        const problemData = {
+            title: title,
+            description: description,
+            level: level,
+            status: 'pending',
+            createdBy: currentUser.uid,
+            createdByName: document.getElementById('user-name').textContent,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            solution: null,
+            solvedAt: null
+        };
+        
+        // Add assigned technician if selected (only for team leaders and admins)
+        if ((userRole === 'teamleader' || userRole === 'admin') && assignedTechnicianId) {
+            const selectedTechnician = technicians.find(t => t.id === assignedTechnicianId);
+            if (selectedTechnician) {
+                problemData.assignedTo = selectedTechnician.id;
+                problemData.assignedToName = selectedTechnician.name;
                 
-                if (fcmToken) {
-                    // Send the notification using Firebase Cloud Functions
-                    // You'll need to set up a Cloud Function for this
-                    const functions = firebase.functions();
-                    const sendNotification = functions.httpsCallable('sendNotification');
-                    
-                    return sendNotification({
-                        token: fcmToken,
-                        title: title,
-                        body: body
-                    });
-                }
+                // Notify the technician
+                notifyTechnician(selectedTechnician.id, problemData.title, problemData.description);
             }
-        })
-        .then(result => {
-            console.log('Push notification sent successfully:', result);
+        }
+        
+        // Save problem to Firestore
+        db.collection('problems').add(problemData)
+        .then((docRef) => {
+            showToast(i18next.t('problem_submitted'), 'success');
+            document.getElementById('problem-form').reset();
+            newProblemModal.hide();
+            loadProblems();
         })
         .catch(error => {
-            console.error('Error sending push notification:', error);
+            console.error('Error submitting problem:', error);
+            showToast(i18next.t('submission_error'), 'error');
+        })
+        .finally(() => {
+            hideLoading();
         });
-}
+    }
 
     function setProblemFilter(filter) {
         currentProblemFilter = filter;
