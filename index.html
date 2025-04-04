@@ -77,7 +77,35 @@
       opacity: 1;
       pointer-events: auto;
     }
+/* Rating stars styling */
+.rating-stars {
+    font-size: 1.5rem;
+    color: var(--warning-color);
+    cursor: pointer;
+}
 
+.rating-stars i {
+    margin-right: 0.25rem;
+    transition: all 0.2s;
+}
+
+.rating-stars i:hover,
+.rating-stars i.active {
+    color: var(--warning-color);
+    text-shadow: 0 0 5px rgba(248, 150, 30, 0.5);
+    transform: scale(1.2);
+}
+
+.rating {
+    color: var(--warning-color);
+    font-size: 1rem;
+}
+
+/* Emoji styling in titles */
+.card-title .emoji {
+    font-size: 1.2em;
+    margin-left: 0.3em;
+}
     .qr-modal-content {
       background-color: var(--card-bg);
       border-radius: var(--radius-md);
@@ -1416,6 +1444,14 @@
                     <span data-i18n="notifications">Notifications</span>
                     <span id="notification-badge" class="badge">3</span>
                 </a>
+                <a href="#" class="nav-item" data-view="reviews-view">
+                    <i class="fas fa-star"></i>
+                    <span data-i18n="reviews">Reviews ⭐</span>
+                </a>
+                <a href="#" class="nav-item" data-view="ideas-view">
+                    <i class="fas fa-lightbulb"></i>
+                    <span data-i18n="ideas">Ideas 💡</span>
+                </a>
                 <a href="#" class="nav-item" data-view="profile-view">
                     <i class="fas fa-user"></i>
                     <span data-i18n="profile">Profile</span>
@@ -1488,7 +1524,41 @@
                     </div>
                 </div>
             </header>
+<!-- Reviews View -->
+<div id="reviews-view" class="view" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title" data-i18n="reviews">Reviews ⭐</h2>
+            <button class="btn btn-sm btn-primary" id="new-review-btn">
+                <i class="fas fa-plus"></i>
+                <span data-i18n="new_review">New Review</span>
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="reviews-list" class="problems-list">
+                <!-- Reviews will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Ideas View -->
+<div id="ideas-view" class="view" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title" data-i18n="ideas">Ideas 💡</h2>
+            <button class="btn btn-sm btn-primary" id="new-idea-btn">
+                <i class="fas fa-plus"></i>
+                <span data-i18n="new_idea">New Idea</span>
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="ideas-list" class="problems-list">
+                <!-- Ideas will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
             <!-- Content Area -->
             <div class="content-area">
                 <!-- Dashboard View -->
@@ -1698,7 +1768,72 @@
                         </div>
                     </div>
                 </div>
+<!-- New Review Modal -->
+<div class="modal fade" id="newReviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-i18n="add_review">Add Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="review-form">
+                    <div class="mb-3">
+                        <label for="review-title" class="form-label" data-i18n="review_title">Title</label>
+                        <input type="text" class="form-control" id="review-title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="review-content" class="form-label" data-i18n="review_content">Content</label>
+                        <textarea class="form-control" id="review-content" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" data-i18n="review_rating">Rating</label>
+                        <div class="rating-stars">
+                            <i class="fas fa-star active" data-rating="1"></i>
+                            <i class="fas fa-star active" data-rating="2"></i>
+                            <i class="fas fa-star active" data-rating="3"></i>
+                            <i class="fas fa-star active" data-rating="4"></i>
+                            <i class="fas fa-star active" data-rating="5"></i>
+                        </div>
+                        <input type="hidden" id="review-rating" value="5">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-bs-dismiss="modal" data-i18n="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submit-review" data-i18n="submit_review">Submit Review</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- New Idea Modal -->
+<div class="modal fade" id="newIdeaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-i18n="add_idea">Add Idea</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="idea-form">
+                    <div class="mb-3">
+                        <label for="idea-title" class="form-label" data-i18n="idea_title">Title</label>
+                        <input type="text" class="form-control" id="idea-title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="idea-description" class="form-label" data-i18n="idea_description">Description</label>
+                        <textarea class="form-control" id="idea-description" rows="4" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-bs-dismiss="modal" data-i18n="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submit-idea" data-i18n="submit_idea">Submit Idea</button>
+            </div>
+        </div>
+    </div>
+</div>
                 <!-- New Problem Modal -->
                 <div class="modal fade" id="newProblemModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
@@ -2065,7 +2200,36 @@ if (firebase.messaging.isSupported()) {
 "android_app": "Android App",
 "scan_web_qr": "Scan this QR code to open the web version on your mobile device",
 "scan_android_qr": "Scan this QR code to download the Android app from the Play Store",
-                "contact_nabil": "Contact Mr. Nabil Eddghoughi", "download_qr": "Download QR"
+                "contact_nabil": "Contact Mr. Nabil Eddghoughi", "download_qr": "Download QR",
+                "reviews": "Reviews ⭐",
+"ideas": "Ideas 💡",
+"new_review": "New Review",
+"new_idea": "New Idea",
+"add_review": "Add Review",
+"add_idea": "Add Idea",
+"review_title": "Review Title",
+"review_content": "Review Content",
+"review_rating": "Rating",
+"idea_title": "Idea Title",
+"idea_description": "Idea Description",
+"submit_review": "Submit Review",
+"submit_idea": "Submit Idea",
+"no_reviews": "No Reviews Yet",
+"no_ideas": "No Ideas Yet",
+"review_submitted": "Review submitted successfully",
+"idea_submitted": "Idea submitted successfully",
+"review_error": "Error submitting review",
+"idea_error": "Error submitting idea",
+"rating_required": "Please select a rating",
+"fill_all_fields": "Please fill all fields",
+"low_rating": "Low",
+"average_rating": "Average",
+"high_rating": "High",
+"idea_status_new": "New",
+"idea_status_approved": "Approved",
+"idea_status_rejected": "Rejected",
+"idea_status_in_progress": "In Progress",
+"idea_status_completed": "Completed"
               
             }
         },
@@ -2183,7 +2347,36 @@ if (firebase.messaging.isSupported()) {
 "android_app": "Application Android",
 "scan_web_qr": "Scannez ce code QR pour ouvrir la version web sur votre appareil mobile",
 "scan_android_qr": "Scannez ce code QR pour télécharger l'application Android depuis le Play Store",
-                "contact_nabil": "Contacter M. Nabil Eddghoughi","download_qr": "Télécharger QR"
+                "contact_nabil": "Contacter M. Nabil Eddghoughi","download_qr": "Télécharger QR",
+                "reviews": "Avis ⭐",
+"ideas": "Idées 💡",
+"new_review": "Nouvel Avis",
+"new_idea": "Nouvelle Idée",
+"add_review": "Ajouter un Avis",
+"add_idea": "Ajouter une Idée",
+"review_title": "Titre de l'Avis",
+"review_content": "Contenu de l'Avis",
+"review_rating": "Note",
+"idea_title": "Titre de l'Idée",
+"idea_description": "Description de l'Idée",
+"submit_review": "Soumettre l'Avis",
+"submit_idea": "Soumettre l'Idée",
+"no_reviews": "Pas encore d'avis",
+"no_ideas": "Pas encore d'idées",
+"review_submitted": "Avis soumis avec succès",
+"idea_submitted": "Idée soumise avec succès",
+"review_error": "Erreur lors de la soumission de l'avis",
+"idea_error": "Erreur lors de la soumission de l'idée",
+"rating_required": "Veuillez sélectionner une note",
+"fill_all_fields": "Veuillez remplir tous les champs",
+"low_rating": "Faible",
+"average_rating": "Moyenne",
+"high_rating": "Élevée",
+"idea_status_new": "Nouveau",
+"idea_status_approved": "Approuvé",
+"idea_status_rejected": "Rejeté",
+"idea_status_in_progress": "En Cours",
+"idea_status_completed": "Terminé"
             }
         },
         es: {
@@ -2300,7 +2493,36 @@ if (firebase.messaging.isSupported()) {
 "android_app": "Aplicación Android",
 "scan_web_qr": "Escanee este código QR para abrir la versión web en su dispositivo móvil",
 "scan_android_qr": "Escanee este código QR para descargar la aplicación Android desde Play Store",
-            "contact_nabil": "Contactar al Sr. Nabil Eddghoughi","download_qr": "Descargar QR"
+            "contact_nabil": "Contactar al Sr. Nabil Eddghoughi","download_qr": "Descargar QR",
+            "reviews": "Reseñas ⭐",
+"ideas": "Ideas 💡",
+"new_review": "Nueva Reseña",
+"new_idea": "Nueva Idea",
+"add_review": "Agregar Reseña",
+"add_idea": "Agregar Idea",
+"review_title": "Título de la Reseña",
+"review_content": "Contenido de la Reseña",
+"review_rating": "Calificación",
+"idea_title": "Título de la Idea",
+"idea_description": "Descripción de la Idea",
+"submit_review": "Enviar Reseña",
+"submit_idea": "Enviar Idea",
+"no_reviews": "Aún no hay reseñas",
+"no_ideas": "Aún no hay ideas",
+"review_submitted": "Reseña enviada con éxito",
+"idea_submitted": "Idea enviada con éxito",
+"review_error": "Error al enviar la reseña",
+"idea_error": "Error al enviar la idea",
+"rating_required": "Por favor seleccione una calificación",
+"fill_all_fields": "Por favor complete todos los campos",
+"low_rating": "Bajo",
+"average_rating": "Promedio",
+"high_rating": "Alto",
+"idea_status_new": "Nuevo",
+"idea_status_approved": "Aprobado",
+"idea_status_rejected": "Rechazado",
+"idea_status_in_progress": "En Progreso",
+"idea_status_completed": "Completado"
         }
     },
         ar: {
@@ -2417,7 +2639,36 @@ if (firebase.messaging.isSupported()) {
 "android_app": "تطبيق أندرويد",
 "scan_web_qr": "امسح رمز الاستجابة السريعة هذا لفتح النسخة الويب على جهازك المحمول",
 "scan_android_qr": "امسح رمز الاستجابة السريعة هذا لتنزيل تطبيق أندرويد من متجر Play",
-                "contact_nabil": "اتصل بالسيد نبيل الدغوغي","download_qr": "تحميل رمز الاستجابة"
+                "contact_nabil": "اتصل بالسيد نبيل الدغوغي","download_qr": "تحميل رمز الاستجابة",
+                "reviews": "التقييمات ⭐",
+"ideas": "أفكار 💡",
+"new_review": "تقييم جديد",
+"new_idea": "فكرة جديدة",
+"add_review": "إضافة تقييم",
+"add_idea": "إضافة فكرة",
+"review_title": "عنوان التقييم",
+"review_content": "محتوى التقييم",
+"review_rating": "التقييم",
+"idea_title": "عنوان الفكرة",
+"idea_description": "وصف الفكرة",
+"submit_review": "إرسال التقييم",
+"submit_idea": "إرسال الفكرة",
+"no_reviews": "لا توجد تقييمات بعد",
+"no_ideas": "لا توجد أفكار بعد",
+"review_submitted": "تم إرسال التقييم بنجاح",
+"idea_submitted": "تم إرسال الفكرة بنجاح",
+"review_error": "خطأ في إرسال التقييم",
+"idea_error": "خطأ في إرسال الفكرة",
+"rating_required": "الرجاء اختيار تقييم",
+"fill_all_fields": "الرجاء ملء جميع الحقول",
+"low_rating": "منخفض",
+"average_rating": "متوسط",
+"high_rating": "مرتفع",
+"idea_status_new": "جديد",
+"idea_status_approved": "موافق عليه",
+"idea_status_rejected": "مرفوض",
+"idea_status_in_progress": "قيد التنفيذ",
+"idea_status_completed": "مكتمل"
             }
         }
     };
@@ -4192,6 +4443,255 @@ function initFirebaseMessaging() {
         });
     }
   });
+}
+// Initialize event listeners for new buttons
+document.addEventListener('DOMContentLoaded', () => {
+    // Handle new review button
+    document.getElementById('new-review-btn')?.addEventListener('click', () => {
+        const reviewModal = new bootstrap.Modal(document.getElementById('newReviewModal'));
+        reviewModal.show();
+    });
+
+    // Handle new idea button
+    document.getElementById('new-idea-btn')?.addEventListener('click', () => {
+        const ideaModal = new bootstrap.Modal(document.getElementById('newIdeaModal'));
+        ideaModal.show();
+    });
+
+    // Rating stars interaction
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('fa-star') && e.target.closest('.rating-stars')) {
+            const stars = e.target.closest('.rating-stars').querySelectorAll('i');
+            const rating = parseInt(e.target.getAttribute('data-rating'));
+            
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+            
+            document.getElementById('review-rating').value = rating;
+        }
+    });
+
+    // Submit review
+    document.getElementById('submit-review')?.addEventListener('click', submitReview);
+
+    // Submit idea
+    document.getElementById('submit-idea')?.addEventListener('click', submitIdea);
+});
+
+// Load reviews from Firebase
+function loadReviews() {
+    showLoading();
+    db.collection('reviews').orderBy('createdAt', 'desc').get()
+        .then(snapshot => {
+            const reviewsList = document.getElementById('reviews-list');
+            reviewsList.innerHTML = '';
+            
+            if (snapshot.empty) {
+                reviewsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3 class="empty-state-title">No Reviews Yet</h3>
+                        <p class="empty-state-text">Be the first to leave a review!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            snapshot.forEach(doc => {
+                const review = doc.data();
+                const reviewItem = document.createElement('div');
+                reviewItem.className = 'problem-card';
+                reviewItem.innerHTML = `
+                    <div class="problem-header">
+                        <h3 class="problem-title">${review.title}</h3>
+                        <div class="rating">
+                            ${'⭐'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                        </div>
+                    </div>
+                    <div class="problem-meta">
+                        <span class="problem-meta-item">
+                            <i class="fas fa-user"></i> ${review.authorName || 'Anonymous'}
+                        </span>
+                        <span class="problem-meta-item">
+                            <i class="fas fa-calendar"></i> ${review.createdAt?.toDate().toLocaleDateString()}
+                        </span>
+                    </div>
+                    <p class="problem-description">${review.content}</p>
+                `;
+                reviewsList.appendChild(reviewItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading reviews:', error);
+            showToast('Error loading reviews', 'error');
+        })
+        .finally(() => {
+            hideLoading();
+        });
+}
+
+// Load ideas from Firebase
+function loadIdeas() {
+    showLoading();
+    db.collection('ideas').orderBy('createdAt', 'desc').get()
+        .then(snapshot => {
+            const ideasList = document.getElementById('ideas-list');
+            ideasList.innerHTML = '';
+            
+            if (snapshot.empty) {
+                ideasList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3 class="empty-state-title">No Ideas Yet</h3>
+                        <p class="empty-state-text">Share your first idea!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            snapshot.forEach(doc => {
+                const idea = doc.data();
+                const ideaItem = document.createElement('div');
+                ideaItem.className = 'problem-card';
+                ideaItem.innerHTML = `
+                    <div class="problem-header">
+                        <h3 class="problem-title">${idea.title}</h3>
+                        <span class="badge badge-primary">${idea.status || 'New'}</span>
+                    </div>
+                    <div class="problem-meta">
+                        <span class="problem-meta-item">
+                            <i class="fas fa-user"></i> ${idea.authorName || 'Anonymous'}
+                        </span>
+                        <span class="problem-meta-item">
+                            <i class="fas fa-calendar"></i> ${idea.createdAt?.toDate().toLocaleDateString()}
+                        </span>
+                    </div>
+                    <p class="problem-description">${idea.description}</p>
+                `;
+                ideasList.appendChild(ideaItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading ideas:', error);
+            showToast('Error loading ideas', 'error');
+        })
+        .finally(() => {
+            hideLoading();
+        });
+}
+
+// Submit review to Firebase
+function submitReview() {
+    const title = document.getElementById('review-title').value;
+    const content = document.getElementById('review-content').value;
+    const rating = document.getElementById('review-rating').value;
+    
+    if (!title || !content) {
+        showToast('Please fill all fields', 'error');
+        return;
+    }
+    
+    showLoading();
+    db.collection('reviews').add({
+        title: title,
+        content: content,
+        rating: parseInt(rating),
+        authorId: currentUser.uid,
+        authorName: document.getElementById('user-name').textContent,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+        showToast('Review submitted successfully', 'success');
+        document.getElementById('review-form').reset();
+        bootstrap.Modal.getInstance(document.getElementById('newReviewModal')).hide();
+        loadReviews();
+    })
+    .catch(error => {
+        console.error('Error submitting review:', error);
+        showToast('Error submitting review', 'error');
+    })
+    .finally(() => {
+        hideLoading();
+    });
+}
+
+// Submit idea to Firebase
+function submitIdea() {
+    const title = document.getElementById('idea-title').value;
+    const description = document.getElementById('idea-description').value;
+    
+    if (!title || !description) {
+        showToast('Please fill all fields', 'error');
+        return;
+    }
+    
+    showLoading();
+    db.collection('ideas').add({
+        title: title,
+        description: description,
+        authorId: currentUser.uid,
+        authorName: document.getElementById('user-name').textContent,
+        status: 'New',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        votes: 0,
+        voters: []
+    })
+    .then(() => {
+        showToast('Idea submitted successfully', 'success');
+        document.getElementById('idea-form').reset();
+        bootstrap.Modal.getInstance(document.getElementById('newIdeaModal')).hide();
+        loadIdeas();
+    })
+    .catch(error => {
+        console.error('Error submitting idea:', error);
+        showToast('Error submitting idea', 'error');
+    })
+    .finally(() => {
+        hideLoading();
+    });
+}
+
+// Update your switchView function to handle the new views
+function switchView(viewId) {
+    views.forEach(view => {
+        view.style.display = 'none';
+    });
+    document.getElementById(viewId).style.display = 'block';
+    
+    navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-view') === viewId) {
+            item.classList.add('active');
+        }
+    });
+
+    // Update page title
+    const activeNavItem = document.querySelector(`.nav-item[data-view="${viewId}"]`);
+    if (activeNavItem) {
+        const title = activeNavItem.querySelector('span').getAttribute('data-i18n');
+        pageTitle.setAttribute('data-i18n', title);
+        pageTitle.textContent = i18next.t(title);
+        document.title = `${i18next.t(title)} - FaultTrack`;
+    }
+
+    // Load data for specific views
+    if (viewId === 'reviews-view') {
+        loadReviews();
+    } else if (viewId === 'ideas-view') {
+        loadIdeas();
+    }
+
+    // Close mobile menu
+    sidebar.classList.remove('show');
 }
     function saveTokenToFirestore(token) {
         if (!currentUser) return;
