@@ -3133,74 +3133,92 @@ function loadProblemsByTechnician() {
     });
 }
 
+let lastVisibleDoc = null; // Store the last document for pagination
+
 function loadProblemsReport() {
     let query = db.collection('problems')
-        .orderBy('createdAt', 'desc')
-        .limit(pageSize)
-        .offset((currentPage - 1) * pageSize);
-    
+        .orderBy('createdAt', 'desc');
+
     if (currentTimeRange > 0) {
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - currentTimeRange);
         query = query.where('createdAt', '>=', startDate);
     }
-    
-    // First get total count
+
+    // Reset pagination if we're on the first page
+    if (currentPage === 1) {
+        lastVisibleDoc = null;
+    }
+
+    // Add startAfter for pages after the first
+    if (currentPage > 1 && lastVisibleDoc) {
+        query = query.startAfter(lastVisibleDoc);
+    }
+
+    query = query.limit(pageSize);
+
+    // Count query
     let countQuery = db.collection('problems');
     if (currentTimeRange > 0) {
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - currentTimeRange);
         countQuery = countQuery.where('createdAt', '>=', startDate);
     }
-    
+
     return Promise.all([
         countQuery.get(),
         query.get()
     ]).then(([countSnapshot, snapshot]) => {
         totalProblems = countSnapshot.size;
         updatePaginationControls();
-        
+
         const reportBody = document.getElementById('problems-report-body');
         reportBody.innerHTML = '';
-        
+
         if (snapshot.empty) {
             reportBody.innerHTML = `
                 <tr>
                     <td colspan="8" class="text-center py-4">
                         <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
+                            <i class="fas fa-info-circle empty-state-icon"></i>
                             <h3 class="empty-state-title">No Problems Found</h3>
-                            <p class="empty-state-text">There are currently no problems to display.</p>
+                            <p class="empty-state-text">No problems match the selected criteria.</p>
                         </div>
                     </td>
                 </tr>
             `;
             return;
         }
-        
+
+        // Update lastVisibleDoc for pagination
+        lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
+
         snapshot.forEach(doc => {
             const problem = {
                 id: doc.id,
                 ...doc.data()
             };
-            
+
             const createdAt = problem.createdAt ? problem.createdAt.toDate() : new Date();
             const solvedAt = problem.solvedAt ? problem.solvedAt.toDate() : null;
-            
+
             let resolutionTime = '';
             if (createdAt && solvedAt) {
-                const hours = Math.round((solvedAt - createdAt) / (1000 * 60 * 60));
-                resolutionTime = `${hours} hours`;
+                const diffHours = Math.round((solvedAt - createdAt) / (1000 * 60 * 60));
+                resolutionTime = `${diffHours} hours`;
             }
-            
+
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${problem.id.substring(0, 8)}</td>
-                <td>${problem.title}</td>
-                <td><span class="problem-status status-${problem.status}">${i18next.t(problem.status)}</span></td>
-                <td><span class="problem-level level-${problem.level}">${i18next.t(problem.level)}</span></td>
+                <td>${problem.title || 'No title'}</td>
+                <td><span class="badge ${problem.status === 'solved' ? 'badge-success' : 'badge-warning'}">
+                    ${problem.status || 'pending'}
+                </span></td>
+                <td><span class="badge ${
+                    problem.level === 'low' ? 'badge-success' :
+                    problem.level === 'medium' ? 'badge-warning' : 'badge-danger'
+                }">${problem.level || 'unknown'}</span></td>
                 <td>${problem.assignedToName || 'Unassigned'}</td>
                 <td>${createdAt.toLocaleString()}</td>
                 <td>${solvedAt ? solvedAt.toLocaleString() : '-'}</td>
@@ -3210,8 +3228,17 @@ function loadProblemsReport() {
         });
     }).catch(error => {
         console.error('Error loading problems report:', error);
+        const reportBody = document.getElementById('problems-report-body');
+        reportBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-4 text-danger">
+                    Error loading data. Please try again.
+                </td>
+            </tr>
+        `;
     });
 }
+
 
 function updatePaginationControls() {
     const prevBtn = document.getElementById('prev-page');
@@ -5448,11 +5475,18 @@ function submitIdea() {
 
 // Update your switchView function to handle the new views
 function switchView(viewId) {
+    // Hide all views
     views.forEach(view => {
-        view.style.display = 'none';
+        if (view) view.style.display = 'none';
     });
-    document.getElementById(viewId).style.display = 'block';
-    
+
+    // Show the selected view
+    const selectedView = document.getElementById(viewId);
+    if (selectedView) {
+        selectedView.style.display = 'block';
+    }
+
+    // Update active navigation item
     navItems.forEach(item => {
         item.classList.remove('active');
         if (item.getAttribute('data-view') === viewId) {
@@ -5460,25 +5494,34 @@ function switchView(viewId) {
         }
     });
 
-    // Update page title
+    // Update page title using i18next
     const activeNavItem = document.querySelector(`.nav-item[data-view="${viewId}"]`);
     if (activeNavItem) {
-        const title = activeNavItem.querySelector('span').getAttribute('data-i18n');
-        pageTitle.setAttribute('data-i18n', title);
-        pageTitle.textContent = i18next.t(title);
-        document.title = `${i18next.t(title)} - FaultTrack`;
+        const titleKey = activeNavItem.querySelector('span')?.getAttribute('data-i18n');
+        if (titleKey) {
+            pageTitle.setAttribute('data-i18n', titleKey);
+            const translatedTitle = i18next.t(titleKey);
+            pageTitle.textContent = translatedTitle;
+            document.title = `${translatedTitle} - FaultTrack`;
+        }
     }
 
     // Load data for specific views
-    if (viewId === 'reviews-view') {
-        loadReviews();
-    } else if (viewId === 'ideas-view') {
-        loadIdeas();
+    switch (viewId) {
+        case 'reviews-view':
+            if (typeof loadReviews === 'function') loadReviews();
+            break;
+        case 'ideas-view':
+            if (typeof loadIdeas === 'function') loadIdeas();
+            break;
     }
 
-    // Close mobile menu
-    sidebar.classList.remove('show');
+    // Close mobile menu if present
+    if (sidebar) {
+        sidebar.classList.remove('show');
+    }
 }
+
   
     function saveTokenToFirestore(token) {
         if (!currentUser) return;
