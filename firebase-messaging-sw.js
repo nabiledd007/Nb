@@ -1,8 +1,7 @@
-// Import Firebase scripts
 importScripts('https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging-compat.js');
 
-// Initialize Firebase
+// تهيئة Firebase في الـ Service Worker
 firebase.initializeApp({
   apiKey: "AIzaSyCmqjuqmp4ixxV17kR7fhHbYxXvIahHWTc",
   authDomain: "nbuser-f550a.firebaseapp.com",
@@ -13,17 +12,17 @@ firebase.initializeApp({
   measurementId: "G-N9R9V26V88"
 });
 
-// Retrieve Firebase Messaging instance
+// استرجاع نسخة من Firebase Messaging
 const messaging = firebase.messaging();
 
-// Handle background messages
+// التعامل مع الإشعارات في الخلفية
 messaging.onBackgroundMessage(function(payload) {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  console.log('[firebase-messaging-sw.js] استلام رسالة في الخلفية', payload);
 
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/favicon.ico' // يمكنك تغييره إلى أي أيقونة
+    icon: '/favicon.ico'  // تقدر تغيرها لأي أيقونة
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
