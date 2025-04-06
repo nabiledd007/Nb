@@ -5268,7 +5268,7 @@ function sendPushNotification(userId, title, body) {
     }
 
     function initFirebaseMessaging() {
-        messaging.getToken({ vapidKey: 'BOVegNHVIRp69hxsN8tNanb87hXFAApJWu76t2EOIW4CW7gmLI6bh5MXKxq7qevGDdx0PizjrA8xYsZBIG5roJQ' }).then((currentToken) => {
+        messaging.getToken({ vapidKey: 'BHFdDaCbaH4QxQVTvbVduTjSC5AQv7ZFJdR6xgAlZH8t-6g9FDwTtXFIn9oV_8KwaaT-KSCptuCJ4uRX1OV0MX0	' }).then((currentToken) => {
             if (currentToken) {
                 // Send the token to your server and update the UI if necessary
                 console.log('FCM token:', currentToken);
@@ -5316,7 +5316,7 @@ function initFirebaseMessaging() {
           messaging.useServiceWorker(registration);
           
           return messaging.getToken({ 
-            vapidKey: 'BOVegNHVIRp69hxsN8tNanb87hXFAApJWu76t2EOIW4CW7gmLI6bh5MXKxq7qevGDdx0PizjrA8xYsZBIG5roJQ',
+            vapidKey: 'BHFdDaCbaH4QxQVTvbVduTjSC5AQv7ZFJdR6xgAlZH8t-6g9FDwTtXFIn9oV_8KwaaT-KSCptuCJ4uRX1OV0MX0	',
             serviceWorkerRegistration: registration
           });
         })
