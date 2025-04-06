@@ -4762,7 +4762,7 @@ function sendPushNotification(userId, title, body) {
     // Notification Functions
     function loadNotifications() {
         db.collection('notifications')
-            .where('userId', '==', currentUser.uid)
+           
             .orderBy('createdAt', 'desc')
             .limit(50)
             .get()
