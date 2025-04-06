@@ -1363,6 +1363,62 @@
         .assign-dialog .d-flex {
             margin-top: 1rem;
         }
+      /* Reports Styles */
+#reports-view .card {
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: none;
+}
+
+#reports-view .card-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+}
+
+#reports-view .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+#reports-view .table th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-light);
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+#reports-view .table td {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    vertical-align: middle;
+}
+
+/* Chart container styles */
+.chart-container {
+    position: relative;
+    height: 100%;
+    min-height: 300px;
+}
+
+/* Pagination styles */
+.dataTables_info {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+/* Dark mode adjustments */
+.dark-mode #reports-view .card-header {
+    background-color: var(--card-bg);
+}
+
+.dark-mode #reports-view .table th {
+    background-color: var(--card-bg);
+}
     </style>
 </head>
 <body class="light-mode">
@@ -1752,22 +1808,111 @@
                 </div>
 
                 <div id="reports-view" class="view" style="display: none;">
-                    <div class="card">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title" data-i18n="reports">Reports & Analytics</h2>
+            <div class="header-actions">
+                <button class="btn btn-sm btn-primary" id="export-reports-btn">
+                    <i class="fas fa-file-export"></i>
+                    <span data-i18n="export_reports">Export</span>
+                </button>
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-sm btn-outline dropdown-toggle" type="button" id="timeRangeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span id="selected-time-range">Last 30 Days</span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="timeRangeDropdown">
+                        <li><a class="dropdown-item time-range-option" href="#" data-range="7">Last 7 Days</a></li>
+                        <li><a class="dropdown-item time-range-option" href="#" data-range="30">Last 30 Days</a></li>
+                        <li><a class="dropdown-item time-range-option" href="#" data-range="90">Last 90 Days</a></li>
+                        <li><a class="dropdown-item time-range-option" href="#" data-range="365">Last Year</a></li>
+                        <li><a class="dropdown-item time-range-option" href="#" data-range="0">All Time</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
                         <div class="card-header">
-                            <h2 class="card-title" data-i18n="reports">Reports</h2>
+                            <h5 class="card-title" data-i18n="problems_by_status">Problems by Status</h5>
                         </div>
                         <div class="card-body">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">
-                                    <i class="fas fa-chart-pie"></i>
-                                </div>
-                                <h3 class="empty-state-title" data-i18n="coming_soon">Coming Soon</h3>
-                                <p class="empty-state-text" data-i18n="reports_coming_soon">Detailed reports and analytics will be available in a future update.</p>
-                                <button class="btn btn-primary" data-i18n="notify_me">Notify Me</button>
-                            </div>
+                            <div id="status-chart" style="height: 300px;"></div>
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title" data-i18n="problems_by_severity">Problems by Severity</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="severity-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title" data-i18n="resolution_time">Average Resolution Time</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="resolution-time-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title" data-i18n="problems_by_technician">Problems by Technician</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="technician-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title" data-i18n="detailed_problem_report">Detailed Problem Report</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" id="problems-report-table">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="problem_id">ID</th>
+                                    <th data-i18n="title">Title</th>
+                                    <th data-i18n="status">Status</th>
+                                    <th data-i18n="severity">Severity</th>
+                                    <th data-i18n="assigned_to">Assigned To</th>
+                                    <th data-i18n="created_at">Created At</th>
+                                    <th data-i18n="resolved_at">Resolved At</th>
+                                    <th data-i18n="resolution_time">Resolution Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="problems-report-body">
+                                <!-- Problems will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <div class="dataTables_info" id="report-info" role="status" aria-live="polite"></div>
+                        <div>
+                            <button id="prev-page" class="btn btn-sm btn-outline" disabled>Previous</button>
+                            <button id="next-page" class="btn btn-sm btn-outline" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                  </div>
 <!-- New Review Modal -->
 <div class="modal fade" id="newReviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -1983,6 +2128,7 @@
     <script src="https://cdn.jsdelivr.net/npm/i18next@21.6.10/i18next.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@1.3.2/i18nextHttpBackend.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+                  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
   
     // Firebase Configuration
@@ -2019,7 +2165,10 @@ if (firebase.messaging.isSupported()) {
     let currentTheme = 'light';
     let technicians = []; // Store technicians list
     let currentProblemFilter = 'all'; // 'all', 'pending', or 'solved'
-
+let currentTimeRange = 30;
+let currentPage = 1;
+const pageSize = 10;
+let totalProblems = 0;
     // DOM Elements
     const authContainer = document.getElementById('auth-container');
     const appContainer = document.getElementById('app-container');
@@ -2229,7 +2378,38 @@ if (firebase.messaging.isSupported()) {
 "idea_status_approved": "Approved",
 "idea_status_rejected": "Rejected",
 "idea_status_in_progress": "In Progress",
-"idea_status_completed": "Completed"
+"idea_status_completed": "Completed",
+              "reports_dashboard": "Reports Dashboard",
+            "last_7_days": "Last 7 Days",
+            "last_30_days": "Last 30 Days",
+            "last_90_days": "Last 90 Days",
+            "last_year": "Last Year",
+            "all_time": "All Time",
+            "export": "Export",
+            "total_problems": "Total Problems",
+            "pending": "Pending",
+            "solved": "Solved",
+            "avg_resolution": "Avg. Resolution",
+            "problems_by_status": "Problems by Status",
+            "problems_by_severity": "Problems by Severity",
+            "detailed_report": "Detailed Report",
+            "id": "ID",
+            "title": "Title",
+            "status": "Status",
+            "severity": "Severity",
+            "technician": "Technician",
+            "created": "Created",
+            "actions": "Actions",
+            "showing_entries": "Showing {from} to {to} of {total} entries",
+            "previous": "Previous",
+            "next": "Next",
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High",
+            "critical": "Critical",
+            "dark_mode": "Dark Mode",
+            "light_mode": "Light Mode"
+              
               
             }
         },
@@ -2376,7 +2556,37 @@ if (firebase.messaging.isSupported()) {
 "idea_status_approved": "Approuvé",
 "idea_status_rejected": "Rejeté",
 "idea_status_in_progress": "En Cours",
-"idea_status_completed": "Terminé"
+"idea_status_completed": "Terminé",
+              "reports_dashboard": "Tableau de bord des rapports",
+            "last_7_days": "7 derniers jours",
+            "last_30_days": "30 derniers jours",
+            "last_90_days": "90 derniers jours",
+            "last_year": "L'année dernière",
+            "all_time": "Toutes les périodes",
+            "export": "Exporter",
+            "total_problems": "Total des problèmes",
+            "pending": "En attente",
+            "solved": "Résolu",
+            "avg_resolution": "Résolution moyenne",
+            "problems_by_status": "Problèmes par statut",
+            "problems_by_severity": "Problèmes par gravité",
+            "detailed_report": "Rapport détaillé",
+            "id": "ID",
+            "title": "Titre",
+            "status": "Statut",
+            "severity": "Gravité",
+            "technician": "Technicien",
+            "created": "Créé",
+            "actions": "Actions",
+            "showing_entries": "Affichage de {from} à {to} sur {total} entrées",
+            "previous": "Précédent",
+            "next": "Suivant",
+            "low": "Faible",
+            "medium": "Moyen",
+            "high": "Élevé",
+            "critical": "Critique",
+            "dark_mode": "Mode sombre",
+            "light_mode": "Mode clair"
             }
         },
         es: {
@@ -2522,7 +2732,37 @@ if (firebase.messaging.isSupported()) {
 "idea_status_approved": "Aprobado",
 "idea_status_rejected": "Rechazado",
 "idea_status_in_progress": "En Progreso",
-"idea_status_completed": "Completado"
+"idea_status_completed": "Completado",
+          "reports_dashboard": "Panel de informes",
+            "last_7_days": "Últimos 7 días",
+            "last_30_days": "Últimos 30 días",
+            "last_90_days": "Últimos 90 días",
+            "last_year": "Año pasado",
+            "all_time": "Todo el tiempo",
+            "export": "Exportar",
+            "total_problems": "Problemas totales",
+            "pending": "Pendiente",
+            "solved": "Resuelto",
+            "avg_resolution": "Resolución promedio",
+            "problems_by_status": "Problemas por estado",
+            "problems_by_severity": "Problemas por gravedad",
+          "detailed_report": "Informe detallado",
+            "id": "ID",
+            "title": "Título",
+            "status": "Estado",
+            "severity": "Gravedad",
+            "technician": "Técnico",
+            "created": "Creado",
+            "actions": "Acciones",
+            "showing_entries": "Mostrando {from} a {to} de {total} entradas",
+            "previous": "Anterior",
+            "next": "Siguiente",
+            "low": "Bajo",
+            "medium": "Medio",
+            "high": "Alto",
+            "critical": "Crítico",
+            "dark_mode": "Modo oscuro",
+            "light_mode": "Modo claro"
         }
     },
         ar: {
@@ -2668,7 +2908,37 @@ if (firebase.messaging.isSupported()) {
 "idea_status_approved": "موافق عليه",
 "idea_status_rejected": "مرفوض",
 "idea_status_in_progress": "قيد التنفيذ",
-"idea_status_completed": "مكتمل"
+"idea_status_completed": "مكتمل",
+               "reports_dashboard": "لوحة التقارير",
+            "last_7_days": "آخر 7 أيام",
+            "last_30_days": "آخر 30 يومًا",
+            "last_90_days": "آخر 90 يومًا",
+            "last_year": "العام الماضي",
+            "all_time": "كل الوقت",
+            "export": "تصدير",
+            "total_problems": "إجمالي المشكلات",
+            "pending": "قيد الانتظار",
+            "solved": "تم الحل",
+            "avg_resolution": "متوسط وقت الحل",
+            "problems_by_status": "المشكلات حسب الحالة",
+            "problems_by_severity": "المشكلات حسب الخطورة",
+            "detailed_report": "تقرير مفصل",
+            "id": "المعرف",
+            "title": "العنوان",
+            "status": "الحالة",
+            "severity": "الخطورة",
+            "technician": "الفني",
+            "created": "تاريخ الإنشاء",
+            "actions": "الإجراءات",
+            "showing_entries": "عرض {from} إلى {to} من أصل {total}",
+            "previous": "السابق",
+            "next": "التالي",
+            "low": "منخفض",
+            "medium": "متوسط",
+            "high": "عالي",
+            "critical": "حرج",
+            "dark_mode": "الوضع المظلم",
+            "light_mode": "الوضع المضيء"
             }
         }
     };
@@ -2685,6 +2955,522 @@ if (firebase.messaging.isSupported()) {
     }, function(err, t) {
         updateContent();
     });
+document.addEventListener('DOMContentLoaded', () => {
+    // Time range selection
+    document.querySelectorAll('.time-range-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentTimeRange = parseInt(e.target.getAttribute('data-range'));
+            document.getElementById('selected-time-range').textContent = e.target.textContent;
+            loadReportsData();
+        });
+    });
+
+    // Pagination buttons
+    document.getElementById('prev-page')?.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            loadProblemsReport();
+        }
+    });
+
+    document.getElementById('next-page')?.addEventListener('click', () => {
+        if (currentPage < Math.ceil(totalProblems / pageSize)) {
+            currentPage++;
+            loadProblemsReport();
+        }
+    });
+
+    // Export button
+    document.getElementById('export-reports-btn')?.addEventListener('click', exportReports);
+});
+
+// Add these functions to your existing JavaScript
+function loadReportsData() {
+    showLoading();
+    currentPage = 1;
+    
+    // Load all data in parallel
+    Promise.all([
+        loadProblemsByStatus(),
+        loadProblemsBySeverity(),
+        loadResolutionTimeData(),
+        loadProblemsByTechnician(),
+        loadProblemsReport()
+    ]).finally(() => {
+        hideLoading();
+    });
+}
+
+function loadProblemsByStatus() {
+    let query = db.collection('problems');
+    
+    // Apply time range filter
+    if (currentTimeRange > 0) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - currentTimeRange);
+        query = query.where('createdAt', '>=', startDate);
+    }
+    
+    return query.get().then(snapshot => {
+        const statusCounts = {
+            pending: 0,
+            solved: 0
+        };
+        
+        snapshot.forEach(doc => {
+            const problem = doc.data();
+            statusCounts[problem.status]++;
+        });
+        
+        renderStatusChart(statusCounts);
+    }).catch(error => {
+        console.error('Error loading problems by status:', error);
+    });
+}
+
+function loadProblemsBySeverity() {
+    let query = db.collection('problems');
+    
+    if (currentTimeRange > 0) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - currentTimeRange);
+        query = query.where('createdAt', '>=', startDate);
+    }
+    
+    return query.get().then(snapshot => {
+        const severityCounts = {
+            low: 0,
+            medium: 0,
+            high: 0,
+            critical: 0
+        };
+        
+        snapshot.forEach(doc => {
+            const problem = doc.data();
+            severityCounts[problem.level]++;
+        });
+        
+        renderSeverityChart(severityCounts);
+    }).catch(error => {
+        console.error('Error loading problems by severity:', error);
+    });
+}
+
+function loadResolutionTimeData() {
+    let query = db.collection('problems').where('status', '==', 'solved');
+    
+    if (currentTimeRange > 0) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - currentTimeRange);
+        query = query.where('solvedAt', '>=', startDate);
+    }
+    
+    // Add orderBy clause to satisfy Firestore query requirements
+    query = query.orderBy('solvedAt', 'desc');
+    
+    return query.get().then(snapshot => {
+        const resolutionData = {
+            low: { total: 0, count: 0 },
+            medium: { total: 0, count: 0 },
+            high: { total: 0, count: 0 },
+            critical: { total: 0, count: 0 }
+        };
+        
+        snapshot.forEach(doc => {
+            const problem = doc.data();
+            if (problem.createdAt && problem.solvedAt) {
+                const created = problem.createdAt.toDate();
+                const solved = problem.solvedAt.toDate();
+                const hours = (solved - created) / (1000 * 60 * 60);
+                
+                resolutionData[problem.level].total += hours;
+                resolutionData[problem.level].count++;
+            }
+        });
+        
+        // Calculate averages
+        const averages = {};
+        for (const level in resolutionData) {
+            averages[level] = resolutionData[level].count > 0 
+                ? (resolutionData[level].total / resolutionData[level].count).toFixed(1)
+                : 0;
+        }
+        
+        renderResolutionTimeChart(averages);
+    }).catch(error => {
+        console.error('Error loading resolution time data:', error);
+        // Show a more user-friendly error message
+        showToast(i18next.t('load_data_error'), 'error');
+    });
+}
+
+function loadProblemsByTechnician() {
+    let query = db.collection('problems');
+    
+    if (currentTimeRange > 0) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - currentTimeRange);
+        query = query.where('createdAt', '>=', startDate);
+    }
+    
+    return query.get().then(snapshot => {
+        const technicianCounts = {};
+        
+        snapshot.forEach(doc => {
+            const problem = doc.data();
+            if (problem.assignedToName) {
+                if (!technicianCounts[problem.assignedToName]) {
+                    technicianCounts[problem.assignedToName] = 0;
+                }
+                technicianCounts[problem.assignedToName]++;
+            }
+        });
+        
+        renderTechnicianChart(technicianCounts);
+    }).catch(error => {
+        console.error('Error loading problems by technician:', error);
+    });
+}
+
+function loadProblemsReport() {
+    let query = db.collection('problems')
+        .orderBy('createdAt', 'desc')
+        .limit(pageSize)
+        .offset((currentPage - 1) * pageSize);
+    
+    if (currentTimeRange > 0) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - currentTimeRange);
+        query = query.where('createdAt', '>=', startDate);
+    }
+    
+    // First get total count
+    let countQuery = db.collection('problems');
+    if (currentTimeRange > 0) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - currentTimeRange);
+        countQuery = countQuery.where('createdAt', '>=', startDate);
+    }
+    
+    return Promise.all([
+        countQuery.get(),
+        query.get()
+    ]).then(([countSnapshot, snapshot]) => {
+        totalProblems = countSnapshot.size;
+        updatePaginationControls();
+        
+        const reportBody = document.getElementById('problems-report-body');
+        reportBody.innerHTML = '';
+        
+        if (snapshot.empty) {
+            reportBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 class="empty-state-title">No Problems Found</h3>
+                            <p class="empty-state-text">There are currently no problems to display.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        snapshot.forEach(doc => {
+            const problem = {
+                id: doc.id,
+                ...doc.data()
+            };
+            
+            const createdAt = problem.createdAt ? problem.createdAt.toDate() : new Date();
+            const solvedAt = problem.solvedAt ? problem.solvedAt.toDate() : null;
+            
+            let resolutionTime = '';
+            if (createdAt && solvedAt) {
+                const hours = Math.round((solvedAt - createdAt) / (1000 * 60 * 60));
+                resolutionTime = `${hours} hours`;
+            }
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${problem.id.substring(0, 8)}</td>
+                <td>${problem.title}</td>
+                <td><span class="problem-status status-${problem.status}">${i18next.t(problem.status)}</span></td>
+                <td><span class="problem-level level-${problem.level}">${i18next.t(problem.level)}</span></td>
+                <td>${problem.assignedToName || 'Unassigned'}</td>
+                <td>${createdAt.toLocaleString()}</td>
+                <td>${solvedAt ? solvedAt.toLocaleString() : '-'}</td>
+                <td>${resolutionTime || '-'}</td>
+            `;
+            reportBody.appendChild(row);
+        });
+    }).catch(error => {
+        console.error('Error loading problems report:', error);
+    });
+}
+
+function updatePaginationControls() {
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const infoElement = document.getElementById('report-info');
+    
+    prevBtn.disabled = currentPage <= 1;
+    nextBtn.disabled = currentPage >= Math.ceil(totalProblems / pageSize);
+    
+    const start = ((currentPage - 1) * pageSize) + 1;
+    const end = Math.min(currentPage * pageSize, totalProblems);
+    
+    infoElement.textContent = `Showing ${start} to ${end} of ${totalProblems} entries`;
+}
+
+function renderStatusChart(data) {
+    const chartElement = document.getElementById('status-chart');
+    
+    // Clear previous chart if it exists
+    while (chartElement.firstChild) {
+        chartElement.removeChild(chartElement.firstChild);
+    }
+    
+    const chart = new ApexCharts(chartElement, {
+        series: [data.pending, data.solved],
+        chart: {
+            type: 'donut',
+            height: 300,
+            foreColor: getComputedStyle(document.body).getPropertyValue('--text-primary')
+        },
+        labels: ['Pending', 'Solved'],
+        colors: [getComputedStyle(document.body).getPropertyValue('--warning-color'), 
+                getComputedStyle(document.body).getPropertyValue('--success-color')],
+        legend: {
+            position: 'bottom'
+        },
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                chart: {
+                    width: 200
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }]
+    });
+    
+    chart.render();
+}
+
+function renderSeverityChart(data) {
+    const chartElement = document.getElementById('severity-chart');
+    
+    while (chartElement.firstChild) {
+        chartElement.removeChild(chartElement.firstChild);
+    }
+    
+    const chart = new ApexCharts(chartElement, {
+        series: [{
+            name: 'Problems',
+            data: [
+                { x: 'Low', y: data.low, fillColor: getComputedStyle(document.body).getPropertyValue('--success-color') },
+                { x: 'Medium', y: data.medium, fillColor: getComputedStyle(document.body).getPropertyValue('--warning-color') },
+                { x: 'High', y: data.high, fillColor: getComputedStyle(document.body).getPropertyValue('--danger-color') },
+                { x: 'Critical', y: data.critical, fillColor: getComputedStyle(document.body).getPropertyValue('--danger-color') }
+            ]
+        }],
+        chart: {
+            type: 'bar',
+            height: 300,
+            foreColor: getComputedStyle(document.body).getPropertyValue('--text-primary')
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                horizontal: true,
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        xaxis: {
+            categories: ['Low', 'Medium', 'High', 'Critical'],
+        },
+        tooltip: {
+            y: {
+                formatter: function (val) {
+                    return val + " problems"
+                }
+            }
+        }
+    });
+    
+    chart.render();
+}
+
+function renderResolutionTimeChart(data) {
+    const chartElement = document.getElementById('resolution-time-chart');
+    
+    while (chartElement.firstChild) {
+        chartElement.removeChild(chartElement.firstChild);
+    }
+    
+    const chart = new ApexCharts(chartElement, {
+        series: [{
+            name: 'Hours',
+            data: [
+                { x: 'Low', y: data.low, fillColor: getComputedStyle(document.body).getPropertyValue('--success-color') },
+                { x: 'Medium', y: data.medium, fillColor: getComputedStyle(document.body).getPropertyValue('--warning-color') },
+                { x: 'High', y: data.high, fillColor: getComputedStyle(document.body).getPropertyValue('--danger-color') },
+                { x: 'Critical', y: data.critical, fillColor: getComputedStyle(document.body).getPropertyValue('--danger-color') }
+            ]
+        }],
+        chart: {
+            type: 'bar',
+            height: 300,
+            foreColor: getComputedStyle(document.body).getPropertyValue('--text-primary')
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                columnWidth: '70%',
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        yaxis: {
+            title: {
+                text: 'Hours'
+            }
+        },
+        xaxis: {
+            categories: ['Low', 'Medium', 'High', 'Critical'],
+        },
+        tooltip: {
+            y: {
+                formatter: function (val) {
+                    return val + " hours"
+                }
+            }
+        }
+    });
+    
+    chart.render();
+}
+
+function renderTechnicianChart(data) {
+    const chartElement = document.getElementById('technician-chart');
+    
+    while (chartElement.firstChild) {
+        chartElement.removeChild(chartElement.firstChild);
+    }
+    
+    // Convert object to array and sort by count
+    const techArray = Object.keys(data).map(key => ({
+        name: key,
+        count: data[key]
+    })).sort((a, b) => b.count - a.count);
+    
+    const chart = new ApexCharts(chartElement, {
+        series: techArray.map(tech => tech.count),
+        chart: {
+            type: 'pie',
+            height: 300,
+            foreColor: getComputedStyle(document.body).getPropertyValue('--text-primary')
+        },
+        labels: techArray.map(tech => tech.name),
+        colors: [
+            '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', '#f72585', 
+            '#b5179e', '#7209b7', '#560bad', '#480ca8', '#3a0ca3'
+        ],
+        legend: {
+            position: 'bottom'
+        },
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                chart: {
+                    width: 200
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }]
+    });
+    
+    chart.render();
+}
+
+function exportReports() {
+    showLoading();
+    
+    let query = db.collection('problems').orderBy('createdAt', 'desc');
+    
+    if (currentTimeRange > 0) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - currentTimeRange);
+        query = query.where('createdAt', '>=', startDate);
+    }
+    
+    query.get().then(snapshot => {
+        const problemsData = [];
+        
+        snapshot.forEach(doc => {
+            const problem = doc.data();
+            const createdAt = problem.createdAt ? problem.createdAt.toDate() : new Date();
+            const solvedAt = problem.solvedAt ? problem.solvedAt.toDate() : null;
+            
+            let resolutionTime = '';
+            if (createdAt && solvedAt) {
+                const hours = Math.round((solvedAt - createdAt) / (1000 * 60 * 60));
+                resolutionTime = `${hours} hours`;
+            }
+            
+            problemsData.push({
+                ID: doc.id.substring(0, 8),
+                Title: problem.title,
+                Description: problem.description,
+                Status: problem.status,
+                Severity: problem.level,
+                'Assigned To': problem.assignedToName || 'Unassigned',
+                'Created At': createdAt.toLocaleString(),
+                'Resolved At': solvedAt ? solvedAt.toLocaleString() : '-',
+                'Resolution Time': resolutionTime || '-'
+            });
+        });
+        
+        // Create CSV content
+        const headers = Object.keys(problemsData[0]).join(',');
+        const rows = problemsData.map(obj => 
+            Object.values(obj).map(value => 
+                `"${value.toString().replace(/"/g, '""')}"`
+            ).join(',')
+        );
+        const csvContent = [headers, ...rows].join('\n');
+        
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `problems_report_${new Date().toISOString().slice(0,10)}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showToast('Report exported successfully', 'success');
+    }).catch(error => {
+        console.error('Error exporting reports:', error);
+        showToast('Error exporting reports', 'error');
+    }).finally(() => {
+        hideLoading();
+    });
+}
 
     // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
@@ -4693,6 +5479,7 @@ function switchView(viewId) {
     // Close mobile menu
     sidebar.classList.remove('show');
 }
+  
     function saveTokenToFirestore(token) {
         if (!currentUser) return;
         
