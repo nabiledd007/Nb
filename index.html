@@ -2120,8 +2120,7 @@
       </div>
     </div>
 </div>
-
-    <!-- Scripts -->
+ <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
@@ -2130,10 +2129,8 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
                   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-  
-    // Firebase Configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyCmqjuqmp4ixxV17kR7fhHbYxXvIahHWTc",
+  apiKey: "AIzaSyCmqjuqmp4ixxV17kR7fhHbYxXvIahHWTc",
   authDomain: "nbuser-f550a.firebaseapp.com",
   databaseURL: "https://nbuser-f550a-default-rtdb.firebaseio.com",
   projectId: "nbuser-f550a",
@@ -2155,6 +2152,16 @@ if (firebase.messaging.isSupported()) {
   messaging = firebase.messaging();
 }
 
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/Nb/firebase-messaging-sw.js')
+    .then(function(registration) {
+      console.log('Service Worker registered with scope:', registration.scope);
+    })
+    .catch(function(error) {
+      console.log('Service Worker registration failed:', error);
+    });
+}
     // Global Variables
     let currentUser = null;
     let userRole = null;
