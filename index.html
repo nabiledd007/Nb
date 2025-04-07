@@ -2151,17 +2151,16 @@ let messaging;
 if (firebase.messaging.isSupported()) {
   messaging = firebase.messaging();
 }
-
-// Register Service Worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Nb/firebase-messaging-sw.js')
-    .then(function(registration) {
-      console.log('Service Worker registered with scope:', registration.scope);
-    })
-    .catch(function(error) {
-      console.log('Service Worker registration failed:', error);
-    });
-}
+    navigator.serviceWorker.register('firebase-messaging-sw.js')
+      .then(function(registration) {
+        console.log('Service Worker registered with scope:', registration.scope);
+      })
+      .catch(function(error) {
+        console.log('Service Worker registration failed:', error);
+      });
+  }
+ 
     // Global Variables
     let currentUser = null;
     let userRole = null;
