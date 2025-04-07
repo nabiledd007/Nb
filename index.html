@@ -4008,7 +4008,7 @@ function exportReports() {
             pageTitle.textContent = i18next.t(title);
             
             // Also update document title
-            document.title = `${i18next.t(title)} - FaultTrack`;
+            document.title = `${i18next.t(title)} - NB CODE`;
         }
 
         // Close mobile menu
@@ -4155,7 +4155,7 @@ function exportReports() {
                 const title = navItem.querySelector('span').getAttribute('data-i18n');
                 pageTitle.setAttribute('data-i18n', title);
                 pageTitle.textContent = i18next.t(title);
-                document.title = `${i18next.t(title)} - FaultTrack`;
+                document.title = `${i18next.t(title)} - NB CODE`;
             }
         }
     }
@@ -5812,7 +5812,7 @@ function switchView(viewId) {
             pageTitle.setAttribute('data-i18n', titleKey);
             const translatedTitle = i18next.t(titleKey);
             pageTitle.textContent = translatedTitle;
-            document.title = `${translatedTitle} - FaultTrack`;
+            document.title = `${translatedTitle} - NB CODE`;
         }
     }
 
