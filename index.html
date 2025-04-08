@@ -60,6 +60,16 @@
             
             --transition: all 0.3s ease;
         }
+        /* Add this to your style section */
+#refresh-all-btn:hover i {
+    color: var(--primary-color);
+    transform: rotate(180deg);
+    transition: transform 0.5s ease, color 0.3s ease;
+}
+
+#refresh-all-btn i.fa-spin {
+    color: var(--primary-color);
+}
         /* Enhanced Bottom Navigation */
 .bottom-nav {
     display: none;
@@ -1741,7 +1751,11 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1 class="header-title" id="page-title" data-i18n="dashboard">Dashboard</h1>
+              
                 <div class="header-actions">
+                    <button class="control-btn" id="refresh-all-btn" title="Refresh System">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                     <div class="language-selector">
                         <button class="control-btn" id="current-lang-btn" title="Change Language">
                             <img src="https://flagcdn.com/w20/gb.png" alt="English" width="20" height="15">
@@ -2171,44 +2185,6 @@
         </div>
     </div>
                   </div>
-<!-- New Review Modal -->
-<div class="modal fade" id="newReviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" data-i18n="add_review">Add Review</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="review-form">
-                    <div class="mb-3">
-                        <label for="review-title" class="form-label" data-i18n="review_title">Title</label>
-                        <input type="text" class="form-control" id="review-title" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="review-content" class="form-label" data-i18n="review_content">Content</label>
-                        <textarea class="form-control" id="review-content" rows="4" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" data-i18n="review_rating">Rating</label>
-                        <div class="rating-stars">
-                            <i class="fas fa-star active" data-rating="1"></i>
-                            <i class="fas fa-star active" data-rating="2"></i>
-                            <i class="fas fa-star active" data-rating="3"></i>
-                            <i class="fas fa-star active" data-rating="4"></i>
-                            <i class="fas fa-star active" data-rating="5"></i>
-                        </div>
-                        <input type="hidden" id="review-rating" value="5">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" data-bs-dismiss="modal" data-i18n="cancel">Cancel</button>
-                <button type="button" class="btn btn-primary" id="submit-review" data-i18n="submit_review">Submit Review</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- New Idea Modal -->
 <div class="modal fade" id="newIdeaModal" tabindex="-1" aria-hidden="true">
@@ -3901,7 +3877,55 @@ if (createdAt && solvedAt) {
         hideLoading();
     });
 }
+// Add this with your other event listeners
+document.getElementById('refresh-all-btn')?.addEventListener('click', refreshAllData);
 
+// Add this function to your JavaScript
+function refreshAllData() {
+    showLoading();
+    
+    // Add animation to the refresh icon
+    const refreshIcon = document.querySelector('#refresh-all-btn i');
+    refreshIcon.classList.add('fa-spin');
+    
+    // Refresh all data based on current view
+    const currentView = document.querySelector('.view[style="display: block;"]') || 
+                       document.querySelector('.view:not([style])');
+    
+    if (currentView) {
+        switch(currentView.id) {
+            case 'dashboard-view':
+                loadProblems();
+                break;
+            case 'problems-view':
+                loadProblems();
+                break;
+            case 'notifications-view':
+                loadNotifications();
+                break;
+            case 'reviews-view':
+                loadReviews();
+                break;
+            case 'ideas-view':
+                loadIdeas();
+                break;
+            case 'users-view':
+                loadUsers();
+                break;
+            case 'reports-view':
+                loadReportsData();
+                break;
+            default:
+                loadProblems();
+        }
+    }
+    
+    // Stop spinning after 1 second (even if data is still loading)
+    setTimeout(() => {
+        refreshIcon.classList.remove('fa-spin');
+        showToast('System refreshed', 'success');
+    }, 1000);
+}
     // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
         // Check auth state
@@ -5791,48 +5815,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Submit Review Function
-function submitReview() {
-    const title = document.getElementById('review-title').value;
-    const content = document.getElementById('review-content').value;
-    const rating = document.getElementById('review-rating').value;
-    
-    if (!title || !content || rating === "0") {
-        showToast('Please complete all fields including the rating', 'error');
-        return;
-    }
-    
-    showLoading();
-    
-    const reviewData = {
-        title: title,
-        content: content,
-        rating: parseInt(rating),
-        authorId: currentUser.uid,
-        authorName: document.getElementById('user-name').textContent,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        helpfulCount: 0,
-        images: [] // You can implement image upload functionality later
-    };
-    
-    db.collection('reviews').add(reviewData)
-        .then(() => {
-            showToast('Thank you for your review!', 'success');
-            document.getElementById('review-form').reset();
-            bootstrap.Modal.getInstance(document.getElementById('newReviewModal')).hide();
-            loadReviews();
-            
-            // Update the average rating display
-            updateAverageRating();
-        })
-        .catch(error => {
-            console.error('Error submitting review:', error);
-            showToast('Failed to submit review. Please try again.', 'error');
-        })
-        .finally(() => {
-            hideLoading();
-        });
-}
+
 
 // Function to update average rating (you'll need to implement the calculation)
 function updateAverageRating() {
