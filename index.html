@@ -24,6 +24,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+   <!-- Add these script tags to your head section -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Arabic font -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -57,6 +60,91 @@
             
             --transition: all 0.3s ease;
         }
+        /* Enhanced Bottom Navigation */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--sidebar-bg);
+    border-top: 1px solid var(--border-color);
+    z-index: 90;
+    padding: 0.5rem 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.bottom-nav-items {
+    display: flex;
+    justify-content: space-around;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.bottom-nav-item i {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.bottom-nav-item.active {
+    color: var(--primary-color);
+    transform: translateY(-5px);
+}
+
+.bottom-nav-item.active i {
+    transform: scale(1.2);
+}
+
+.bottom-nav-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(25%, -25%);
+    background-color: var(--danger-color);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: bold;
+}
+
+/* Location Modal Styles */
+#map-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.location-pin {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    color: var(--primary-color);
+    font-size: 2rem;
+    text-shadow: 0 0 3px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 991px) {
+    .bottom-nav {
+        display: block;
+    }
+}
         .qr-modal {
       position: fixed;
       top: 0;
@@ -1611,7 +1699,40 @@
                 </button>
             </div>
         </div>
-
+<!-- Location Modal -->
+<div class="modal fade" id="locationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-i18n="share_location">Share Location</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="location-status" class="text-center mb-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2" data-i18n="getting_location">Getting your location...</p>
+                </div>
+                <div id="location-details" style="display: none;">
+                    <div id="map-container" style="height: 200px; background-color: #f5f5f5; border-radius: 8px; margin-bottom: 15px;"></div>
+                    <div class="mb-3">
+                        <label class="form-label" data-i18n="additional_notes">Additional Notes</label>
+                        <textarea class="form-control" id="location-notes" rows="3" placeholder="Add any additional details about your location"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted" id="location-accuracy"></small>
+                        <small class="text-muted" id="location-time"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-bs-dismiss="modal" data-i18n="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" id="share-location-btn" disabled data-i18n="share_location">Share Location</button>
+            </div>
+        </div>
+    </div>
+</div>
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Header -->
@@ -1942,10 +2063,9 @@
         <div class="card-header">
             <h2 class="card-title" data-i18n="reports">Reports & Analytics</h2>
             <div class="header-actions">
-                <button class="btn btn-sm btn-primary" id="export-reports-btn">
-                    <i class="fas fa-file-export"></i>
-                    <span data-i18n="export_reports">Export</span>
-                </button>
+                
+             
+                
                 <div class="dropdown d-inline-block">
                     <button class="btn btn-sm btn-outline dropdown-toggle" type="button" id="timeRangeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <span id="selected-time-range">Last 30 Days</span>
@@ -1958,6 +2078,14 @@
                         <li><a class="dropdown-item time-range-option" href="#" data-range="0">All Time</a></li>
                     </ul>
                 </div>
+                <button class="btn btn-sm btn-primary" id="export-reports-btn">
+                    <i class="fas fa-file-export"></i>
+                    <span data-i18n="export_reports">EXCEL</span>
+                </button>
+                <button class="btn btn-sm btn-danger ms-2" id="export-pdf-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    <span data-i18n="export_pdf">PDF</span>
+                </button>
             </div>
         </div>
         <div class="card-body">
@@ -2186,30 +2314,34 @@
             </div>
         </div>
 
-        <!-- Bottom Navigation - Mobile Only -->
-        <nav class="bottom-nav">
-            <div class="bottom-nav-items">
-                <a href="#" class="bottom-nav-item active" data-view="dashboard-view">
-                    <i class="fas fa-home"></i>
-                    <span data-i18n="dashboard">Dashboard</span>
-                </a>
-                <a href="#" class="bottom-nav-item" data-view="problems-view">
-                    <i class="fas fa-tasks"></i>
-                    <span data-i18n="problems">Problems</span>
-                </a>
-                <a href="#" class="bottom-nav-item" data-view="notifications-view">
-                    <div style="position: relative;">
-                        <i class="fas fa-bell"></i>
-                        <span data-i18n="notifications">Notifications</span>
-                        <div id="mobile-notification-badge" class="bottom-nav-badge" style="display: none;">3</div>
-                    </div>
-                </a>
-                <a href="#" class="bottom-nav-item" data-view="profile-view">
-                    <i class="fas fa-user"></i>
-                    <span data-i18n="profile">Profile</span>
-                </a>
+      <!-- Bottom Navigation - Mobile Only -->
+<nav class="bottom-nav">
+    <div class="bottom-nav-items">
+        <a href="#" class="bottom-nav-item active" data-view="dashboard-view">
+            <i class="fas fa-home"></i>
+            <span data-i18n="dashboard">Dashboard</span>
+        </a>
+        <a href="#" class="bottom-nav-item" data-view="problems-view">
+            <i class="fas fa-tasks"></i>
+            <span data-i18n="problems">Problems</span>
+        </a>
+        <a href="#" class="bottom-nav-item" id="location-btn">
+            <i class="fas fa-map-marker-alt"></i>
+            <span data-i18n="location">Location</span>
+        </a>
+        <a href="#" class="bottom-nav-item" data-view="notifications-view">
+            <div style="position: relative;">
+                <i class="fas fa-bell"></i>
+                <span data-i18n="notifications">Notifications</span>
+                <div id="mobile-notification-badge" class="bottom-nav-badge" style="display: none;">3</div>
             </div>
-        </nav>
+        </a>
+        <a href="#" class="bottom-nav-item" data-view="profile-view">
+            <i class="fas fa-user"></i>
+            <span data-i18n="profile">Profile</span>
+        </a>
+    </div>
+</nav>
     </div>
 
     <!-- Loading Spinner -->
@@ -2250,6 +2382,7 @@
       </div>
     </div>
 </div>
+
  <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -2258,6 +2391,13 @@
     <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@1.3.2/i18nextHttpBackend.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
                   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+                  <!-- Add these right before your main script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    // Make jsPDF available globally
+    window.jsPDF = window.jspdf.jsPDF;
+</script>
 <script>
     const firebaseConfig = {
   apiKey : "AIzaSyCmqjuqmp4ixxV17kR7fhHbYxXvIahHWTc" , 
@@ -2390,6 +2530,14 @@ let totalProblems = 0;
     const resources = {
         en: {
             translation: {
+                "location": "Location",
+    "share_location": "Share Location",
+    "getting_location": "Getting your location...",
+    "location_found": "Location found!",
+    "geolocation_not_supported": "Geolocation is not supported by your browser",
+    "additional_notes": "Additional Notes",
+    "location_shared_success": "Location shared successfully",
+    "location_shared_error": "Error sharing location",
                 "welcome": "Welcome Back",
                 "email": "Email",
                 "password": "Password",
@@ -2538,7 +2686,7 @@ let totalProblems = 0;
 "last_90_days": "Last 90 Days",
 "last_year": "Last Year",
 "all_time": "All Time",
-"export": "Export",
+"export": "EXCEL",
 "total_problems": "Total Problems",
 "pending": "Pending",
 "solved": "Solved",
@@ -2563,7 +2711,7 @@ let totalProblems = 0;
 "dark_mode": "Dark Mode",
 "light_mode": "Light Mode",
               reports: "Reports & Analytics",
-        export_reports: "Export",
+        export_reports: "EXCEL",
         problems_by_status: "Problems by Status",
         problems_by_severity: "Problems by Severity",
         resolution_time: "Average Resolution Time",
@@ -2581,13 +2729,24 @@ let totalProblems = 0;
             "30": "Last 30 Days",
             "90": "Last 90 Days",
             "365": "Last Year",
-            "0": "All Time"
+            "0": "All Time",
+            "export_pdf": "PDF" // English
               
               
             }
         },
         fr: {
             translation: {
+                "location": "Localisation",
+"share_location": "Partager la localisation",
+"getting_location": "Obtention de votre localisation...",
+"location_found": "Localisation trouvée !",
+"geolocation_not_supported": "La géolocalisation n'est pas prise en charge par votre navigateur",
+"additional_notes": "Notes supplémentaires",
+"location_shared_success": "Localisation partagée avec succès",
+"location_shared_error": "Erreur lors du partage de la localisation",
+     
+"export_pdf": "Exporter en PDF" ,// French,
                 "welcome": "Bienvenue",
                 "email": "Email",
                 "password": "Mot de passe",
@@ -2761,7 +2920,7 @@ let totalProblems = 0;
 "dark_mode": "Mode sombre",
 "light_mode": "Mode clair",
                reports: "Rapports & Analyses",
-        export_reports: "Exporter",
+        export_reports: "EXCEL",
         problems_by_status: "Problèmes par statut",
         problems_by_severity: "Problèmes par gravité",
         resolution_time: "Temps de résolution moyen",
@@ -2779,6 +2938,14 @@ let totalProblems = 0;
         },
         es: {
         translation: {
+            "location": "Ubicación",
+"share_location": "Compartir ubicación",
+"getting_location": "Obteniendo tu ubicación...",
+"location_found": "¡Ubicación encontrada!",
+"geolocation_not_supported": "Geolocalización no es compatible con tu navegador",
+"additional_notes": "Notas adicionales",
+"location_shared_success": "Ubicación compartida exitosamente",
+"location_shared_error": "Error al compartir la ubicación",
             "welcome": "Bienvenido de nuevo",
             "email": "Correo electrónico",
             "password": "Contraseña",
@@ -2952,7 +3119,7 @@ let totalProblems = 0;
 "dark_mode": "Modo oscuro",
 "light_mode": "Modo claro",
              reports: "Informes y Análisis",
-        export_reports: "Exportar",
+        export_reports: "EXCEL",
         problems_by_status: "Problemas por estado",
         problems_by_severity: "Problemas por gravedad",
         resolution_time: "Tiempo promedio de resolución",
@@ -2965,11 +3132,21 @@ let totalProblems = 0;
         assigned_to: "Asignado a",
         created_at: "Creado en",
         resolved_at: "Resuelto en",
-        resolution_time: "Tiempo de resolución"
+        resolution_time: "Tiempo de resolución",
+   
+"export_pdf": "Exportar PDF" // Spanish
         }
     },
         ar: {
             translation: {
+                "location": "الموقع",
+"share_location": "مشاركة الموقع",
+"getting_location": "جاري الحصول على موقعك...",
+"location_found": "تم العثور على الموقع!",
+"geolocation_not_supported": "المتصفح الخاص بك لا يدعم تحديد الموقع الجغرافي",
+"additional_notes": "ملاحظات إضافية",
+"location_shared_success": "تم مشاركة الموقع بنجاح",
+"location_shared_error": "خطأ في مشاركة الموقع",
                 "welcome": "مرحبًا بعودتك",
                 "email": "البريد الإلكتروني",
                 "password": "كلمة المرور",
@@ -3161,7 +3338,10 @@ let totalProblems = 0;
             "30": "آخر 30 يومًا",
             "90": "آخر 90 يومًا",
             "365": "السنة الماضية",
-            "0": "كل الوقت"
+            "0": "كل الوقت",// Add this to each language's translation object
+
+"export_pdf": "تصدير PDF" // Arabic
+
             }
         }
     };
@@ -3305,7 +3485,7 @@ function loadResolutionTimeData() {
             if (problem.createdAt && problem.solvedAt) {
                 const created = problem.createdAt.toDate();
                 const solved = problem.solvedAt.toDate();
-                const hours = (solved - created) / (1000 * 60 * 60);
+                const hours = (solved - created) / (1000 * 60 );
                 
                 resolutionData[problem.level].total += hours;
                 resolutionData[problem.level].count++;
@@ -3427,8 +3607,8 @@ function loadProblemsReport() {
 
             let resolutionTime = '';
             if (createdAt && solvedAt) {
-                const diffHours = Math.round((solvedAt - createdAt) / (1000 * 60 * 60));
-                resolutionTime = `${diffHours} hours`;
+                const diffHours = Math.round((solvedAt - createdAt) / (1000 * 60 ));
+                resolutionTime = `${diffHours} minutes`;
             }
 
             const row = document.createElement('tr');
@@ -3675,10 +3855,10 @@ function exportReports() {
             const solvedAt = problem.solvedAt ? problem.solvedAt.toDate() : null;
             
             let resolutionTime = '';
-            if (createdAt && solvedAt) {
-                const hours = Math.round((solvedAt - createdAt) / (1000 * 60 * 60));
-                resolutionTime = `${hours} hours`;
-            }
+if (createdAt && solvedAt) {
+    const minutes = Math.round((solvedAt - createdAt) / (1000 * 60)); // convert milliseconds to minutes
+    resolutionTime = `${minutes} minutes`;
+}
             
             problemsData.push({
                 ID: doc.id.substring(0, 8),
@@ -5854,6 +6034,427 @@ function switchView(viewId) {
     
     // You can add other role-based UI changes here
 }
+// Add this function to your JavaScript
+function exportReportsToPDF() {
+    showLoading();
+    
+    // Use html2canvas and jsPDF libraries (you'll need to include these)
+    const element = document.getElementById('reports-view');
+    
+    // Options for html2canvas
+    const options = {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        scrollY: 0
+    };
+    
+    // Create PDF
+    html2canvas(element, options).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`reports_${new Date().toISOString().slice(0,10)}.pdf`);
+        showToast('PDF exported successfully', 'success');
+    }).catch(error => {
+        console.error('Error exporting PDF:', error);
+        showToast('Error exporting PDF', 'error');
+    }).finally(() => {
+        hideLoading();
+    });
+}
+// Location Functions
+function initLocationFeatures() {
+    const locationBtn = document.getElementById('location-btn');
+    const locationModal = new bootstrap.Modal(document.getElementById('locationModal'));
+    
+    if (locationBtn) {
+        locationBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            locationModal.show();
+            getCurrentLocation();
+        });
+    }
+    
+    document.getElementById('share-location-btn')?.addEventListener('click', shareLocation);
+}
+
+let currentLocation = null;
+
+function getCurrentLocation() {
+    const locationStatus = document.getElementById('location-status');
+    const locationDetails = document.getElementById('location-details');
+    const shareBtn = document.getElementById('share-location-btn');
+    
+    locationStatus.innerHTML = `
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2" data-i18n="getting_location">Getting your location...</p>
+    `;
+    locationDetails.style.display = 'none';
+    shareBtn.disabled = true;
+    
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                currentLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    accuracy: position.coords.accuracy,
+                    timestamp: new Date(position.timestamp)
+                };
+                
+                displayLocationOnMap(currentLocation);
+                
+                locationStatus.innerHTML = `
+                    <i class="fas fa-check-circle text-success fa-3x mb-2"></i>
+                    <p data-i18n="location_found">Location found!</p>
+                `;
+                locationDetails.style.display = 'block';
+                shareBtn.disabled = false;
+                
+                document.getElementById('location-accuracy').textContent = 
+                    `Accuracy: ${Math.round(currentLocation.accuracy)} meters`;
+                document.getElementById('location-time').textContent = 
+                    `Time: ${currentLocation.timestamp.toLocaleTimeString()}`;
+            },
+            (error) => {
+                let errorMessage = "Error getting location";
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = "Location permission denied";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = "Location information unavailable";
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = "Location request timed out";
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        errorMessage = "Unknown error occurred";
+                        break;
+                }
+                
+                locationStatus.innerHTML = `
+                    <i class="fas fa-exclamation-circle text-danger fa-3x mb-2"></i>
+                    <p>${errorMessage}</p>
+                    <button class="btn btn-sm btn-primary mt-2" onclick="getCurrentLocation()">
+                        <i class="fas fa-sync-alt me-1"></i> Try Again
+                    </button>
+                `;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    } else {
+        locationStatus.innerHTML = `
+            <i class="fas fa-exclamation-circle text-danger fa-3x mb-2"></i>
+            <p data-i18n="geolocation_not_supported">Geolocation is not supported by your browser</p>
+        `;
+    }
+}
+
+function displayLocationOnMap(location) {
+    const mapContainer = document.getElementById('map-container');
+    mapContainer.innerHTML = `
+        <iframe 
+            width="100%" 
+            height="100%" 
+            frameborder="0" 
+            scrolling="no" 
+            marginheight="0" 
+            marginwidth="0" 
+            src="https://maps.google.com/maps?q=${location.lat},${location.lng}&z=15&output=embed"
+            style="border-radius: 8px;"
+        ></iframe>
+        <div class="location-pin">
+            <i class="fas fa-map-marker-alt"></i>
+        </div>
+    `;
+}
+
+function shareLocation() {
+    if (!currentLocation) return;
+    
+    const notes = document.getElementById('location-notes').value;
+    const locationModal = bootstrap.Modal.getInstance(document.getElementById('locationModal'));
+    
+    showLoading();
+    
+    // Save location to Firebase
+    db.collection('locations').add({
+        userId: currentUser.uid,
+        userName: document.getElementById('user-name').textContent,
+        latitude: currentLocation.lat,
+        longitude: currentLocation.lng,
+        accuracy: currentLocation.accuracy,
+        notes: notes,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+        showToast('Location shared successfully', 'success');
+        locationModal.hide();
+    })
+    .catch(error => {
+        console.error('Error sharing location:', error);
+        showToast('Error sharing location', 'error');
+    })
+    .finally(() => {
+        hideLoading();
+    });
+}
+
+// Admin-only user details function
+function showUserDetails(userId) {
+    if (userRole !== 'admin') return;
+    
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    
+    showLoading();
+    
+    // Get additional user details from Firebase
+    db.collection('users').doc(userId).get()
+        .then(doc => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const lastLogin = userData.lastLogin ? userData.lastLogin.toDate().toLocaleString() : 'Never';
+                const createdAt = userData.createdAt ? userData.createdAt.toDate().toLocaleString() : 'Unknown';
+                
+                // Show user details modal
+                const userDetailsModal = new bootstrap.Modal(document.createElement('div'));
+                userDetailsModal._element.className = 'modal fade';
+                userDetailsModal._element.innerHTML = `
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">User Details (Admin View)</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-4 text-center">
+                                        <div class="user-avatar-lg mb-3">
+                                            ${user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                        </div>
+                                        <h4>${user.name}</h4>
+                                        <span class="badge ${user.role === 'admin' ? 'bg-danger' : user.role === 'teamleader' ? 'bg-warning' : 'bg-primary'}">
+                                            ${user.role}
+                                        </span>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <th>Email:</th>
+                                                    <td>${user.email}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>User ID:</th>
+                                                    <td><small>${user.id}</small></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Account Created:</th>
+                                                    <td>${createdAt}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Last Login:</th>
+                                                    <td>${lastLogin}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Language:</th>
+                                                    <td>${userData.language || 'Default'}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Theme:</th>
+                                                    <td>${userData.theme || 'Default'}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <h6>Recent Activity</h6>
+                                            <div id="user-activity-list" class="list-group" style="max-height: 200px; overflow-y: auto;">
+                                                <div class="list-group-item text-center py-3">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    Loading activity...
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" id="admin-reset-user-password">Reset Password</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(userDetailsModal._element);
+                userDetailsModal.show();
+                
+                // Load user activity
+                loadUserActivity(userId);
+                
+                // Add event listener for reset password button
+                document.getElementById('admin-reset-user-password')?.addEventListener('click', () => {
+                    resetUserPassword(userId, userDetailsModal);
+                });
+                
+                // Clean up modal when closed
+                userDetailsModal._element.addEventListener('hidden.bs.modal', () => {
+                    document.body.removeChild(userDetailsModal._element);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user details:', error);
+            showToast('Error loading user details', 'error');
+        })
+        .finally(() => {
+            hideLoading();
+        });
+}
+
+function loadUserActivity(userId) {
+    const activityList = document.getElementById('user-activity-list');
+    if (!activityList) return;
+    
+    // Get recent problems created by user
+    const problemsPromise = db.collection('problems')
+        .where('createdBy', '==', userId)
+        .orderBy('createdAt', 'desc')
+        .limit(5)
+        .get();
+    
+    // Get recent locations shared by user
+    const locationsPromise = db.collection('locations')
+        .where('userId', '==', userId)
+        .orderBy('timestamp', 'desc')
+        .limit(5)
+        .get();
+    
+    Promise.all([problemsPromise, locationsPromise])
+        .then(([problemsSnapshot, locationsSnapshot]) => {
+            activityList.innerHTML = '';
+            
+            if (problemsSnapshot.empty && locationsSnapshot.empty) {
+                activityList.innerHTML = `
+                    <div class="list-group-item text-center py-3 text-muted">
+                        No recent activity found
+                    </div>
+                `;
+                return;
+            }
+            
+            // Add problems to activity list
+            problemsSnapshot.forEach(doc => {
+                const problem = doc.data();
+                const date = problem.createdAt?.toDate().toLocaleString() || 'Unknown';
+                
+                const activityItem = document.createElement('div');
+                activityItem.className = 'list-group-item';
+                activityItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-tasks text-primary me-2"></i>
+                            <strong>${problem.title || 'Problem'}</strong>
+                            <div class="text-muted small">${date}</div>
+                        </div>
+                        <span class="badge ${problem.status === 'solved' ? 'bg-success' : 'bg-warning'}">
+                            ${problem.status || 'pending'}
+                        </span>
+                    </div>
+                `;
+                activityList.appendChild(activityItem);
+            });
+            
+            // Add locations to activity list
+            locationsSnapshot.forEach(doc => {
+                const location = doc.data();
+                const date = location.timestamp?.toDate().toLocaleString() || 'Unknown';
+                
+                const activityItem = document.createElement('div');
+                activityItem.className = 'list-group-item';
+                activityItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                            <strong>Location Shared</strong>
+                            <div class="text-muted small">${date}</div>
+                        </div>
+                        <a href="https://maps.google.com/?q=${location.latitude},${location.longitude}" 
+                           target="_blank" class="btn btn-sm btn-outline-primary">
+                            View
+                        </a>
+                    </div>
+                `;
+                activityList.appendChild(activityItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading user activity:', error);
+            activityList.innerHTML = `
+                <div class="list-group-item text-center py-3 text-danger">
+                    Error loading activity data
+                </div>
+            `;
+        });
+}
+
+function resetUserPassword(userId, modal) {
+    if (!confirm('Are you sure you want to reset this user\'s password? They will receive an email to set a new password.')) {
+        return;
+    }
+    
+    showLoading();
+    
+    // Admin must be signed in to reset passwords
+    auth.sendPasswordResetEmail(user.email)
+        .then(() => {
+            showToast('Password reset email sent to user', 'success');
+            modal.hide();
+        })
+        .catch(error => {
+            console.error('Error resetting password:', error);
+            showToast('Error resetting password', 'error');
+        })
+        .finally(() => {
+            hideLoading();
+        });
+}
+
+// Add this to your DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', () => {
+    initLocationFeatures();
+    
+    // Update your existing user table to include click handler for admin
+    if (userRole === 'admin') {
+        document.querySelectorAll('#users-table-body tr').forEach(row => {
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', (e) => {
+                if (!e.target.closest('button')) { // Don't trigger if clicking a button
+                    const userId = row.querySelector('.edit-user')?.getAttribute('data-id');
+                    if (userId) showUserDetails(userId);
+                }
+            });
+        });
+    }
+});
+// Add this event listener in your DOMContentLoaded section
+document.getElementById('export-pdf-btn')?.addEventListener('click', exportReportsToPDF);
     // Initialize the app
     function initializeApp() {
         // Check for saved language preference
@@ -5876,6 +6477,7 @@ function switchView(viewId) {
     // Start the app
     initializeApp();
 </script>
+
 </body>
 </html>
 <!-- partial -->
